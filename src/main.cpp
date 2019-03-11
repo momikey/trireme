@@ -8,4 +8,10 @@ int main(int, char**) {
     {
         std::cout << lowest_trit(v) << '\n';
     }
+
+    auto powtest = {0u, 1u, 2u, 6u, 9u, 12u, 18u};
+    for (auto&& v : powtest)
+    {
+        std::cout << pow3(v) << '\n';
+    }
 }

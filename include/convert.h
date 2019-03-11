@@ -2,6 +2,7 @@
 #define TRIREME_CONVERT_H
 
 #include <cstdlib>
+#include <array>
 
 /**
  * @brief Returns the lowest trit for an integer.
@@ -22,4 +23,9 @@ constexpr int lowest_trit(int value)
     }
 }
 
-#endif
+constexpr int pow3(unsigned int exponent)
+{
+    return (exponent == 0) ? 1 : 3 * pow3(exponent - 1);
+}
+
+#endif /* TRIREME_CONVERT_H */
