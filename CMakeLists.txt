@@ -8,7 +8,10 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(PROJECT_SOURCES src/main.cpp src/convert.cpp include/convert.h)
+
 add_executable(trireme src/main.cpp)
+target_include_directories(trireme PRIVATE include)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
