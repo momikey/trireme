@@ -50,7 +50,7 @@ constexpr Int sign_c(Int value)
  * @return constexpr int 3 raised to the given exponent
  */
 template<typename Int = int, typename E = unsigned int>
-constexpr Int pow3(E exponent)
+constexpr Int pow3(E exponent) noexcept
 {
     return (exponent == 0) ? 1 : 3 * pow3(exponent - 1);
 }
@@ -62,7 +62,7 @@ constexpr Int pow3(E exponent)
  * @return constexpr int A value {1, 0, -1} representing the lowest balanced trit
  */
 template<typename Int = int>
-constexpr Int lowest_trit(Int value)
+constexpr Int lowest_trit(Int value) noexcept
 {
     const auto temp = value % 3;
 
@@ -84,7 +84,7 @@ constexpr Int lowest_trit(Int value)
  * @return constexpr Int The value shifted to the right by the given number of places
  */
 template<typename Int>
-constexpr Int shift_right(Int value, std::size_t places)
+constexpr Int shift_right(Int value, std::size_t places) noexcept
 {
     if (places == 0)
     {
@@ -105,7 +105,7 @@ constexpr Int shift_right(Int value, std::size_t places)
 }
 
 template<typename Int>
-constexpr Int nth_trit(Int value, std::size_t place)
+constexpr Int nth_trit(Int value, std::size_t place) noexcept
 {
     return lowest_trit(shift_right(value, place));
 }

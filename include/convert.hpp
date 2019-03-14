@@ -17,14 +17,14 @@
  * @return constexpr Int The decimal value of the balanced ternary digits
  */
 template<typename Int, std::size_t Size>
-constexpr Int to_decimal(const std::array<Int, Size>& arr)
+constexpr Int to_decimal(const std::array<Int, Size>& arr) noexcept
 {
     return detail::to_decimal_impl(arr, Size-1);
 }
 
 
 template<typename Int, std::size_t Size>
-constexpr std::array<Int, Size> to_trits(Int value)
+constexpr std::array<Int, Size> to_trits(Int value) noexcept
 {
     return detail::to_trits_impl(value, std::make_index_sequence<Size>{});
 }
