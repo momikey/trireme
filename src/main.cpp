@@ -3,6 +3,9 @@
 
 #include "convert.hpp"
 #include "ternary_math.hpp"
+#include "hexad.hpp"
+
+using namespace ternary;
 
 template<typename T, std::size_t N>
 void print_array(const std::array<T,N>& arr)
@@ -11,7 +14,6 @@ void print_array(const std::array<T,N>& arr)
     {
         std::cout << v << ',';
     }
-    std::cout << '\n';
 }
 
 int main(int, char**) {
@@ -19,5 +21,8 @@ int main(int, char**) {
     for (auto i : testvalues)
     {
         print_array(to_trits<int, 6>(i));
+        std::cout << (low_trits(i, 2)) << '\n';
     }
+
+    Hexad h = { 42 };
 }

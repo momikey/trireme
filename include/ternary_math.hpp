@@ -83,7 +83,7 @@ constexpr Int lowest_trit(Int value) noexcept
  * @param places The number of trits to shift
  * @return constexpr Int The value shifted to the right by the given number of places
  */
-template<typename Int>
+template<typename Int = int>
 constexpr Int shift_right(Int value, std::size_t places) noexcept
 {
     if (places == 0)
@@ -104,10 +104,82 @@ constexpr Int shift_right(Int value, std::size_t places) noexcept
     }    
 }
 
-template<typename Int>
+/**
+ * @brief Returns the Nth trit of a given number.
+ * 
+ * @tparam Int Any signed integral type
+ * @param value The given value
+ * @param place The desired trit
+ * @return constexpr Int A value {1,0,-1} at the nth place of the
+ * balanced ternary represntation of _value_
+ */
+template<typename Int = int>
 constexpr Int nth_trit(Int value, std::size_t place) noexcept
 {
     return lowest_trit(shift_right(value, place));
+}
+
+/**
+ * @brief Clamp a given value to fit in a certain number of trits.
+ * 
+ * @tparam Int Any signed integral type
+ * @tparam Width The maximum number of trits in the result
+ * @param value The given value
+ * @return constexpr Int The value, unless it is outside the range
+ * (+/- (3**width-1) / 2), in which case the appropriate maximum is
+ * returned.
+ */
+template<typename Int = int, std::size_t Width>
+constexpr Int clamp(Int value) noexcept
+{
+    const auto max = pow3(Width) / 2;
+
+    if (value > max)
+    {
+        return max;
+    }
+    else if (value < -max)
+    {
+        return -max;
+    }
+    else
+    {
+        return value;
+    }
+}
+
+/**
+ * @brief Get the lowest N trits of a number.
+ * 
+ * @tparam Int Any signed integral type
+ * @param value The given value
+ * @tparam width The desired number of trits in the result
+ * @return constexpr Int An integer congruent to _value_ mod 3**Width,
+ * within the range (+/- (3**Width-1) / 2)
+ */
+template<typename Int = int>
+constexpr Int low_trits(Int value, std::size_t width) noexcept
+{
+    const auto power = pow3(width);
+    const auto halfpower = power / 2;
+
+    if (abs_c(value) > halfpower)
+    {
+        const auto m = value % power;
+
+        if (abs_c(m) > halfpower)
+        {
+            return m - power*sign_c(value);
+        }
+        else
+        {
+            return m;
+        }
+    }
+    else
+    {
+        return value;
+    }
 }
 
 #endif /* TRIREME_TERNARY_MATH_HPP */
