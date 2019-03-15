@@ -10,11 +10,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(TRIREME_INCLUDES include/convert.hpp include/ternary_math.hpp include/hexad.hpp)
 set(TRIREME_IMPL_INCLUDES detail/convert_impl.hpp)
-set(TRIREME_SOURCES src/main.cpp)
+set(TRIREME_SOURCES src/main.cpp src/hexad.cpp)
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})
 
-add_executable(trireme src/main.cpp)
+add_executable(trireme ${TRIREME_SOURCES})
 target_include_directories(trireme PRIVATE include)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

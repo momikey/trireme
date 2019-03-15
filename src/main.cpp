@@ -16,6 +16,11 @@ void print_array(const std::array<T,N>& arr)
     }
 }
 
+std::ostream& operator<<(std::ostream& os, std::pair<Hexad, Hexad> pair)
+{
+    return os << pair.first.get() << ',' << pair.second.get();
+}
+
 int main(int, char**) {
     const std::array<int, 6> testvalues = { 3, -9, 5, 19, -32, 89};
     for (auto i : testvalues)
@@ -25,4 +30,11 @@ int main(int, char**) {
     }
 
     Hexad h = { 42 };
+    Hexad i = { 333 };
+    std::cout << add(h, i).get() << '\n';
+    std::cout << add_with_carry(h, i) << '\n';
+    std::cout << subtract(i, h).get() << '\n';
+    std::cout << subtract_with_carry(h, i) << '\n';
+    std::cout << multiply(h, i) << '\n';
+    std::cout << divide(i, h) << '\n';
 }
