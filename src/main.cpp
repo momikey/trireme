@@ -37,4 +37,9 @@ int main(int, char**) {
     std::cout << subtract_with_carry(h, i) << '\n';
     std::cout << multiply(h, i) << '\n';
     std::cout << divide(i, h) << '\n';
+
+    std::cout << divide({ {h}, {i} }, i) << '\n';
+
+    std::cout << left_shift(h, 2) << '\n';
+    std::cout << right_shift(i, 3) << '\n';
 }

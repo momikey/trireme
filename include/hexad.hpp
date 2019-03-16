@@ -79,9 +79,47 @@ namespace ternary {
      */
     value_with_carry<Hexad> subtract_with_carry(const Hexad lhs, const Hexad rhs);
 
+    /**
+     * @brief Multiply two hexads, returning a double-precision result.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return std::pair<Hexad, Hexad> The low and high hexads of the result
+     */
     std::pair<Hexad, Hexad> multiply(const Hexad lhs, const Hexad rhs);
 
+    /**
+     * @brief Divide the lhs hexad by the rhs, returning the quotient and remainder.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return std::pair<Hexad, Hexad> The quotient and remainder
+     */
     std::pair<Hexad, Hexad> divide(const Hexad lhs, const Hexad rhs);
+
+    /**
+     * @brief Divide a 2-hexad number by the rhs, returning
+     * the quotient and remainder.
+     * 
+     * @param lhs A pair of hexads {low, high} (i.e., in little-endian order)
+     * @param rhs 
+     * @return std::pair<Hexad, Hexad> The quotient and remainder
+     */
+    std::pair<Hexad, Hexad> divide(const std::pair<Hexad, Hexad> lhs, const Hexad rhs);
+
+    // Digital operations
+    // These are operations that work directly on trits (the analogue of
+    // binary AND, OR, etc.), and they normally return new hexads containing
+    // the result of the operation.
+
+
+    inline Hexad left_shift(const Hexad operand) { return { operand.get() * 3 }; }
+
+    std::pair<Hexad, int> left_shift(const Hexad operand, std::size_t places);
+
+    inline Hexad right_shift(const Hexad operand) { return { operand.get() / 3}; }
+
+    std::pair<Hexad, int> right_shift(const Hexad operand, std::size_t places);
 }
 
 #endif /* TRIREME_HECAD_HPP */

@@ -35,4 +35,43 @@ namespace ternary {
 
         return { {div_}, {mod_} };
     }
+
+    std::pair<Hexad, Hexad> divide(const std::pair<Hexad, Hexad> lhs, const Hexad rhs)
+    {
+        const auto full = lhs.first.get() + lhs.second.get() * Hexad::range;
+        const auto div_ = full / rhs.get();
+        const auto mod_ = full % rhs.get();
+
+        return { {div_}, {mod_} };
+    }
+
+    std::pair<Hexad, int> left_shift(const Hexad operand, std::size_t places)
+    {
+        if (places >= Hexad::width)
+        {
+            return { {0}, (places == Hexad::width) ? lowest_trit(operand.get()) : 0 };
+        }
+        else
+        {
+            const auto result = operand.get() * pow3(places);
+            return { {result}, nth_trit(operand.get(), Hexad::width - places) };
+        }
+    }
+
+    std::pair<Hexad, int> right_shift(const Hexad operand, std::size_t places)
+    {
+        if (places == 0)
+        {
+            return { operand, places };
+        }
+        else if (places >= Hexad::width)
+        {
+            return { {0}, (places == Hexad::width) ? nth_trit(operand.get(), Hexad::width - 1) : 0};
+        }
+        else
+        {
+            const auto result = shift_right(operand.get(), places);
+            return { {result}, nth_trit(operand.get(), places - 1) };
+        }
+    }
 }
