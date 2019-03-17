@@ -16,6 +16,11 @@ void print_array(const std::array<T,N>& arr)
     }
 }
 
+std::ostream& operator<<(std::ostream& os, Hexad h)
+{
+    return os << "H" << h.get();
+}
+
 std::ostream& operator<<(std::ostream& os, std::pair<Hexad, Hexad> pair)
 {
     return os << pair.first.get() << ',' << pair.second.get();
@@ -42,4 +47,27 @@ int main(int, char**) {
 
     std::cout << left_shift(h, 2) << '\n';
     std::cout << right_shift(i, 3) << '\n';
+
+    std::pair<Hexad, int> hc = { h, 0 };
+    for (int n = 0; n < 6; ++n)
+    {
+        auto rot { rotate_left_carry(hc.first, hc.second, n) };
+        std::cout << rot << '\t';
+        print_array(rot.first.trits());
+        std::cout << '\n';
+    }
+
+    print_array(i.trits());
+    std::cout << '\t' << positive_invert(i) << '\t';
+    print_array(positive_invert(i).trits());
+    std::cout << '\n';
+
+    print_array(h.trits());
+    std::cout << '\t';
+    print_array(i.trits());
+    std::cout
+        << '\n' << trit_minimum(h, i)
+        << '\n' << trit_maximum(h, i)
+        << '\n' << logical_equality(h, i)
+        << '\n';
 }

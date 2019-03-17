@@ -113,13 +113,147 @@ namespace ternary {
     // the result of the operation.
 
 
+    /**
+     * @brief Shift a hexad left a single place..
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
     inline Hexad left_shift(const Hexad operand) { return { operand.get() * 3 }; }
 
+    /**
+     * @brief Shift a hexad left a given number of places.
+     * 
+     * @param operand The operand
+     * @param places The number of places to shift
+     * @return std::pair<Hexad, int> The result of the shift and the last trit shifted out
+     */
     std::pair<Hexad, int> left_shift(const Hexad operand, std::size_t places);
 
+    /**
+     * @brief Shift a hexad right a single place
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
     inline Hexad right_shift(const Hexad operand) { return { operand.get() / 3}; }
 
+    /**
+     * @brief Shift a hexad right a given number of places.
+     * 
+     * @param operand The operand
+     * @param places The number of places to shift
+     * @return std::pair<Hexad, int> The result of the shift and the last trit shifted out
+     */
     std::pair<Hexad, int> right_shift(const Hexad operand, std::size_t places);
+
+    /**
+     * @brief Rotate a hexad left a given number of places.
+     * 
+     * @param operand 
+     * @param places 
+     * @return Hexad 
+     */
+    Hexad rotate_left(const Hexad operand, std::size_t places);
+
+    /**
+     * @brief Rotate a hexad right a given number of places.
+     * 
+     * @param operand 
+     * @param places 
+     * @return Hexad 
+     */
+    Hexad rotate_right(const Hexad operand, std::size_t places);
+
+    /**
+     * @brief Rotate a hexad and supplementary carry trit a given number of places to the left.
+     * 
+     * @param operand 
+     * @param carry 
+     * @param places 
+     * @return std::pair<Hexad, int> The rotated hexad and carry trit
+     */
+    std::pair<Hexad, int> rotate_left_carry(const Hexad operand, int carry, std::size_t places);
+
+    /**
+     * @brief Rotate a hexad and supplementary carry trit a given number of places to the right.
+     * 
+     * @param operand 
+     * @param carry 
+     * @param places 
+     * @return std::pair<Hexad, int> 
+     */
+    std::pair<Hexad, int> rotate_right_carry(const Hexad operand, int carry, std::size_t places);
+
+    /**
+     * @brief Invert each trit in a hexad. This is equivalent to negation.
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
+    inline Hexad invert(const Hexad operand) { return {-operand.get() }; }
+
+    /**
+     * @brief Invert each trit in a hexad, additionally changing 0 to +1.
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
+    Hexad positive_invert(const Hexad operand);
+
+    /**
+     * @brief Invert each trit in a hexad, additionally changing 9 to -1.
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
+    Hexad negative_invert(const Hexad operand);
+
+    /**
+     * @brief Return the tritwise minumum of two hexads. This is equivalent to binary AND.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return Hexad 
+     */
+    Hexad trit_minimum(const Hexad lhs, const Hexad rhs);
+
+    /**
+     * @brief Return the tritwise maximum of two hexads. This is equivalent to binary OR.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return Hexad 
+     */
+    Hexad trit_maximum(const Hexad lhs, const Hexad rhs);
+
+    /**
+     * @brief Return a tritwise equality function of two hexads.
+     * Each trit in the result is +1 if the corresponding trits
+     * in the operands are equal, -1 if they are not. This is
+     * similar to binary XOR, but the logic is inverted.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return Hexad 
+     */
+    Hexad logical_equality(const Hexad lhs, const Hexad rhs);
+
+    /**
+     * @brief Return the given hexad with all negative trits changed to 0.
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
+    Hexad forward_diode(const Hexad operand);
+
+    /**
+     * @brief Return the given hexad with all positive trits changed to 0.
+     * 
+     * @param operand 
+     * @return Hexad 
+     */
+    Hexad reverse_diode(const Hexad operand);
 }
 
 #endif /* TRIREME_HECAD_HPP */
