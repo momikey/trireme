@@ -240,6 +240,8 @@ namespace ternary {
         auto low { low_trits(value, 3) };
         auto high { shift_right(value, 3) };
 
-        return triad_to_string(high) + triad_to_string(low);
+        auto result { triad_to_string(high) };
+        result += triad_to_string(low);
+        return result;
     }
 }

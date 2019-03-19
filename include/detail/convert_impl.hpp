@@ -50,9 +50,13 @@ namespace detail
             {
                 return std::string(1, positive[(value-1)]);
             }
-            else
+            else if (value < 0)
             {
                 return std::string(1, negative[-value-1]);
+            }
+            else
+            {
+                return {"0"};
             }
         }
         

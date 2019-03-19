@@ -4,6 +4,7 @@
 #include "convert.hpp"
 #include "ternary_math.hpp"
 #include "hexad.hpp"
+#include "word.hpp"
 
 using namespace ternary;
 
@@ -64,4 +65,13 @@ int main(int, char**) {
 
     std::cout << h.trit_string() << '\t' << i.trit_string() << '\n';
     std::cout << h.value_string() << '\t' << i.value_string() << '\n';
+
+    Hexad w1 { 1 };
+    Hexad w2 { -1 };
+    Hexad w3 { 2 };
+    Word w { w1, w2, w3 };
+
+    std::cout << w1.trit_string() << '\t' << w2.trit_string() << '\t' << w3.trit_string() << '\n';
+    std::cout << w1.value_string() << '\t' << w2.value_string() << '\t' << w3.value_string() << '\n';
+    std::cout << w.value() << '\t' << w.trit_string() << '\n' << w.value_string() << '\n';
 }
