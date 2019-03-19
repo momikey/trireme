@@ -62,12 +62,6 @@ int main(int, char**) {
     print_array(positive_invert(i).trits());
     std::cout << '\n';
 
-    print_array(h.trits());
-    std::cout << '\t';
-    print_array(i.trits());
-    std::cout
-        << '\n' << trit_minimum(h, i)
-        << '\n' << trit_maximum(h, i)
-        << '\n' << logical_equality(h, i)
-        << '\n';
+    std::cout << h.trit_string() << '\t' << i.trit_string() << '\n';
+    std::cout << h.value_string() << '\t' << i.value_string() << '\n';
 }

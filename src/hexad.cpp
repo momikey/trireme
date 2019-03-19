@@ -219,4 +219,27 @@ namespace ternary {
 
         return { to_decimal(tr) };
     }
+
+    std::string Hexad::trit_string() const noexcept
+    {
+        auto tr { trits() };
+        auto result = std::string(Hexad::width, ' ' );
+        std::transform(tr.begin(), tr.end(), result.rbegin(), [](auto e){
+            if (e == 1)
+                { return '+'; }
+            else if (e == -1)
+                { return '-'; }
+            else
+                { return '0'; }
+        });
+        return result;
+    }
+
+    std::string Hexad::value_string() const noexcept
+    {
+        auto low { low_trits(value, 3) };
+        auto high { shift_right(value, 3) };
+
+        return triad_to_string(high) + triad_to_string(low);
+    }
 }

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <utility>
 #include <array>
+#include <string>
 
 #include "ternary_math.hpp"
 #include "convert.hpp"
@@ -27,6 +28,9 @@ namespace ternary {
 
         constexpr value_type get() const { return value; }
         constexpr trit_container_type trits() const { return to_trits<value_type, width>(value); }
+
+        std::string trit_string() const noexcept;
+        std::string value_string() const noexcept;
 
     private:
         value_type value;

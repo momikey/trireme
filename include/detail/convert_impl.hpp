@@ -23,6 +23,40 @@ namespace detail
         return {{ nth_trit(value, Is)... }};
     }
 
+    template<typename Int = int>
+    std::string triad_to_string_impl(Int value) noexcept
+    {
+        // Positive triads use capital letters
+        const std::array<int, 13> positive {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'
+        };
+
+        // Negative triads use lowercase letters
+        const std::array<int, 13> negative {
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+
+        if (abs_c(value) > 13)
+        {
+            // Out of range, so return an empty string
+            // We could throw here (have to take off noexcept, obviously),
+            // but that seems like it might be a waste. This is more of
+            // an internal function, after all.
+            return {};
+        }
+        else
+        {
+            if (value > 0)
+            {
+                return std::string(1, positive[(value-1)]);
+            }
+            else
+            {
+                return std::string(1, negative[-value-1]);
+            }
+        }
+        
+    }
 }
 
 #endif /* TRIREME_CONVERT_IMPL_HPP */
