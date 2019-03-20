@@ -74,4 +74,10 @@ int main(int, char**) {
     std::cout << w1.trit_string() << '\t' << w2.trit_string() << '\t' << w3.trit_string() << '\n';
     std::cout << w1.value_string() << '\t' << w2.value_string() << '\t' << w3.value_string() << '\n';
     std::cout << w.value() << '\t' << w.trit_string() << '\n' << w.value_string() << '\n';
+
+    Word ww1 { 12345 };
+    Word ww2 { -1234 };
+    auto sum = ternary::add(ww1, ww2);
+
+    std::cout << sum.first.value_string() << '\t' << sum.second << '\n';
 }
