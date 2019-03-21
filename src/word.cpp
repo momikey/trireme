@@ -64,10 +64,10 @@ namespace ternary
 
     multiplication_result mul(Word lhs, Word::value_type rhs)
     {
-        long long result = lhs.value() * rhs;
+        long long result = lhs.value() * static_cast<long long>(rhs);
         return {
-            { low_trits(result, Word::word_size) },
-            { shift_right(result, Word::word_size) }
+            { static_cast<Word::value_type>(low_trits(result, Word::word_size)) },
+            { static_cast<Word::value_type>(shift_right(result, Word::word_size)) }
         };
     }
 

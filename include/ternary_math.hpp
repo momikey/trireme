@@ -52,7 +52,7 @@ constexpr Int sign_c(Int value)
 template<typename Int = int, typename E = unsigned int>
 constexpr Int pow3(E exponent) noexcept
 {
-    return (exponent == 0) ? 1 : 3 * pow3(exponent - 1);
+    return (exponent == 0) ? 1 : 3 * pow3<Int>(exponent - 1);
 }
 
 /**
@@ -93,10 +93,10 @@ constexpr Int shift_right(Int value, std::size_t places) noexcept
     }
     else
     {
-        const auto shifted = value / pow3(places);
-        const auto halfpow = pow3(places) / 2;
+        const auto shifted = value / pow3<Int>(places);
+        const auto halfpow = pow3<Int>(places) / 2;
 
-        const auto adjust = abs_c(value - shifted*pow3(places)) > halfpow
+        const auto adjust = abs_c(value - shifted*pow3<Int>(places)) > halfpow
             ? sign_c(value)
             : 0;
 
@@ -132,7 +132,7 @@ constexpr Int nth_trit(Int value, std::size_t place) noexcept
 template<typename Int = int, std::size_t Width>
 constexpr Int clamp(Int value) noexcept
 {
-    const auto max = pow3(Width) / 2;
+    const auto max = pow3<Int>(Width) / 2;
 
     if (value > max)
     {
@@ -160,7 +160,7 @@ constexpr Int clamp(Int value) noexcept
 template<typename Int = int>
 constexpr Int low_trits(Int value, std::size_t width) noexcept
 {
-    const auto power = pow3(width);
+    const auto power = pow3<Int>(width);
     const auto halfpower = power / 2;
 
     if (abs_c(value) > halfpower)
