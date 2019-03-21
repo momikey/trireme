@@ -1,5 +1,6 @@
 #include <string>
 #include <tuple>
+#include <algorithm>
 
 #include "word.hpp"
 #include "ternary_math.hpp"
@@ -56,26 +57,226 @@ namespace ternary
         return add(lhs, { -rhs });
     }
 
-    multiplication_result mul(Word lhs, Word rhs);
-    multiplication_result mul(Word lhs, Word::value_type rhs);
+    multiplication_result mul(Word lhs, Word rhs)
+    {
+        return mul(lhs, rhs.value());
+    }
+
+    multiplication_result mul(Word lhs, Word::value_type rhs)
+    {
+        long long result = lhs.value() * rhs;
+        return {
+            { low_trits(result, Word::word_size) },
+            { shift_right(result, Word::word_size) }
+        };
+    }
 
     division_result div(division_dividend lhs, Word rhs);
     division_result div(division_dividend lhs, Word::value_type rhs);
 
-    shift_result shl(Word operand, Word places);
-    shift_result shl(Word operand, Word::value_type places);
-    shift_result shr(Word operand, Word places);
-    shift_result shr(Word operand, Word::value_type places);
+    shift_result shl(Word operand, Word places)
+    {
+        return shl(operand, places.value());
+    }
 
-    shift_result rol(Word operand, Word places);
-    shift_result rol(Word operand, Word::value_type places);
-    shift_result ror(Word operand, Word places);
-    shift_result ror(Word operand, Word::value_type places);
+    shift_result shl(Word operand, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
 
-    shift_result rcl(Word operand, Word places);
-    shift_result rcl(Word operand, Word::value_type places);
-    shift_result rcr(Word operand, Word places);
-    shift_result rcr(Word operand, Word::value_type places);
+        Word::trit_container_with_carry trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+        trits[Word::word_size] = 0;
+
+        // Shift isn't in STL until C++20, but we can fake it with rotate
+        std::rotate(trits.rbegin(), trits.rbegin()+places, trits.rend());
+        std::fill_n(trits.begin(), places, 0);
+
+        auto carry = trits[Word::word_size];
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, carry };
+    }
+
+    shift_result shr(Word operand, Word places)
+    {
+        return shr(operand, places.value());
+    }
+
+    shift_result shr(Word operand, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
+        else if (places == 0)
+        {
+            return { operand, 0 };
+        }
+
+        Word::trit_container_with_carry trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+        trits[Word::word_size] = 0;
+
+        // Shift isn't in STL until C++20, but we can fake it with rotate
+        std::rotate(trits.begin(), trits.begin()+places, trits.end());
+        std::fill_n(trits.rbegin()+1, places, 0); // +1 because carry
+
+        auto carry = trits[Word::word_size];
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, carry };
+    }
+
+    shift_result rol(Word operand, Word places)
+    {
+        return rol(operand, places.value());
+    }
+
+    shift_result rol(Word operand, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
+        else if (places == 0)
+        {
+            return { operand, 0 };
+        }
+
+        Word::trit_container trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+
+        std::rotate(trits.rbegin(), trits.rbegin()+places, trits.rend());
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, 0 };
+    }
+
+    shift_result ror(Word operand, Word places)
+    {
+        return ror(operand, places.value());
+    }
+
+    shift_result ror(Word operand, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
+        else if (places == 0)
+        {
+            return { operand, 0 };
+        }
+
+        Word::trit_container trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+
+        std::rotate(trits.begin(), trits.begin()+places, trits.end());
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, 0 };
+    }
+
+    shift_result rcl(Word operand, int carry, Word places)
+    {
+        return rcl(operand, carry, places.value());
+    }
+
+    shift_result rcl(Word operand, int carry, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
+        else if (places == 0)
+        {
+            return { operand, carry };
+        }
+
+        Word::trit_container_with_carry trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+        trits[Word::word_size] = 0;
+
+        std::rotate(trits.rbegin(), trits.rbegin()+places, trits.rend());
+
+        carry = trits[Word::word_size];
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, carry };
+    }
+
+    shift_result rcr(Word operand, int carry, Word places)
+    {
+        return rcr(operand, carry, places.value());
+    }
+
+    shift_result rcr(Word operand, int carry, Word::value_type places)
+    {
+        if (places > Word::word_size + 1)
+        {
+            return { {0}, 0 };
+        }
+        else if (places == 0)
+        {
+            return { operand, carry };
+        }
+
+        Word::trit_container_with_carry trits;
+        auto ht = operand.high().trits();
+        auto mt = operand.middle().trits();
+        auto lt = operand.low().trits();
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+        trits[Word::word_size] = 0;
+
+        std::rotate(trits.begin(), trits.begin()+places, trits.end());
+
+        carry = trits[Word::word_size];
+
+        trits[Word::word_size] = 0;
+
+        return { { to_decimal(trits) }, carry };
+    }
 
     Word sti(Word operand)
     {

@@ -2,6 +2,7 @@
 #define TRIREME_WORD_HPP
 
 #include <string>
+#include <array>
 #include <utility>
 
 #include "hexad.hpp"
@@ -10,10 +11,13 @@ namespace ternary
 {
     struct Word
     {
-        using value_type = Hexad::value_type;
-
+        static const auto word_size = 18;
         static const auto high_power = 12;
         static const auto middle_power = 6;
+
+        using value_type = Hexad::value_type;
+        using trit_container = std::array<value_type, word_size>;
+        using trit_container_with_carry = std::array<value_type, word_size+1>;
 
         Word(Word::value_type v):
             low_(low_trits(v, middle_power)),
@@ -92,10 +96,10 @@ namespace ternary
     shift_result ror(Word operand, Word places);
     shift_result ror(Word operand, Word::value_type places);
 
-    shift_result rcl(Word operand, Word places);
-    shift_result rcl(Word operand, Word::value_type places);
-    shift_result rcr(Word operand, Word places);
-    shift_result rcr(Word operand, Word::value_type places);
+    shift_result rcl(Word operand, int carry, Word places);
+    shift_result rcl(Word operand, int carry, Word::value_type places);
+    shift_result rcr(Word operand, int carry, Word places);
+    shift_result rcr(Word operand, int carry, Word::value_type places);
 
     Word sti(Word operand);
     Word pti(Word operand);

@@ -37,6 +37,17 @@ constexpr std::array<Int, Size> to_trits(Int value) noexcept
     return detail::to_trits_impl(value, std::make_index_sequence<Size>{});
 }
 
+/**
+ * @brief Converts a number representing a set of 3 trits
+ * into a single alphanumeric character:
+ * * 0 -> '0'
+ * * +1 to +13 -> 'A' to 'M'
+ * * -1 to -13 -> 'n' to 'z'
+ * 
+ * @tparam int Any integer type
+ * @param value The value to convert
+ * @return std::string A 1-character string following the scheme above
+ */
 template<typename Int = int>
 std::string triad_to_string(Int value) noexcept
 {

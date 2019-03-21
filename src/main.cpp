@@ -22,9 +22,15 @@ std::ostream& operator<<(std::ostream& os, Hexad h)
     return os << "H" << h.get();
 }
 
-std::ostream& operator<<(std::ostream& os, std::pair<Hexad, Hexad> pair)
+std::ostream& operator<<(std::ostream& os, Word w)
 {
-    return os << pair.first.get() << ',' << pair.second.get();
+    return os << w.value_string();
+}
+
+template<typename T, typename U>
+std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
+{
+    return os << pair.first << ',' << pair.second;
 }
 
 int main(int, char**) {
@@ -77,7 +83,9 @@ int main(int, char**) {
 
     Word ww1 { 12345 };
     Word ww2 { -1234 };
-    auto sum = ternary::add(ww1, ww2);
 
-    std::cout << sum.first.value_string() << '\t' << sum.second << '\n';
+    auto big = (long long)ww1.value() * ww2.value() * ww2.value();
+
+    print_array(to_trits<long long, 36>(big));
+    std::cout << mul(ww1,ww2.value() * ww2.value()) << '\n';
 }
