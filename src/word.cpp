@@ -71,8 +71,38 @@ namespace ternary
         };
     }
 
-    division_result div(division_dividend lhs, Word rhs);
-    division_result div(division_dividend lhs, Word::value_type rhs);
+    division_result div(Word lhs, Word rhs)
+    {
+        return div(lhs, rhs.value());
+    }
+
+    division_result div(Word lhs, Word::value_type rhs)
+    {
+        auto d { lhs.value() / rhs };
+        auto r { lhs.value() % rhs };
+
+        return { {d}, {r} };
+    }
+
+    division_result div(division_dividend lhs, Word rhs)
+    {
+        return div(lhs, rhs.value());
+    }
+
+    division_result div(division_dividend lhs, Word::value_type rhs)
+    {
+        long long dividend = lhs.first.value() * pow3<long long>(Word::word_size) + lhs.second.value();
+
+        // Note: double-precision division can overflow
+        // TODO We should check for this
+        auto d { dividend / rhs };
+        auto r { dividend % rhs };
+
+        return {
+            {static_cast<Word::value_type>(d)},
+            {static_cast<Word::value_type>(r)}
+        };
+    }
 
     shift_result shl(Word operand, Word places)
     {
@@ -87,9 +117,9 @@ namespace ternary
         }
 
         Word::trit_container_with_carry trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
@@ -100,7 +130,7 @@ namespace ternary
         std::rotate(trits.rbegin(), trits.rbegin()+places, trits.rend());
         std::fill_n(trits.begin(), places, 0);
 
-        auto carry = trits[Word::word_size];
+        auto carry { trits[Word::word_size] };
 
         trits[Word::word_size] = 0;
 
@@ -124,9 +154,9 @@ namespace ternary
         }
 
         Word::trit_container_with_carry trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
@@ -137,7 +167,7 @@ namespace ternary
         std::rotate(trits.begin(), trits.begin()+places, trits.end());
         std::fill_n(trits.rbegin()+1, places, 0); // +1 because carry
 
-        auto carry = trits[Word::word_size];
+        auto carry { trits[Word::word_size] };
 
         trits[Word::word_size] = 0;
 
@@ -161,9 +191,9 @@ namespace ternary
         }
 
         Word::trit_container trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
@@ -193,9 +223,9 @@ namespace ternary
         }
 
         Word::trit_container trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
@@ -225,9 +255,9 @@ namespace ternary
         }
 
         Word::trit_container_with_carry trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
@@ -260,9 +290,9 @@ namespace ternary
         }
 
         Word::trit_container_with_carry trits;
-        auto ht = operand.high().trits();
-        auto mt = operand.middle().trits();
-        auto lt = operand.low().trits();
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
 
         std::copy(lt.begin(), lt.end(), trits.begin());
         std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);

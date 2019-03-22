@@ -82,6 +82,8 @@ namespace ternary
     multiplication_result mul(Word lhs, Word rhs);
     multiplication_result mul(Word lhs, Word::value_type rhs);
 
+    division_result div(Word lhs, Word rhs);
+    division_result div(Word lhs, Word::value_type rhs);
     division_result div(division_dividend lhs, Word rhs);
     division_result div(division_dividend lhs, Word::value_type rhs);
 

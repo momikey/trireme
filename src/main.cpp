@@ -41,4 +41,11 @@ int main(int, char**) {
 
     print_array(to_trits<long long, 24>(big));
     std::cout << mul(ww1,ww2.value() * ww2.value()) << '\n';
+
+    auto dr { div((ww1), sti(ww2)) };
+
+    std::cout << ww1.value() / ww2.value() << '\t' << dr << '\t'
+        << dr.first.value() * 1234 + dr.second.value() << '\n';
+    std::cout << div({ww2, ww2}, ww1) << '\n';
+    std::cout << (ww2.value() * pow3<long long>(Word::word_size) + ww2.value()) / ww1.value() << '\n';
 }
