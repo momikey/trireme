@@ -362,6 +362,15 @@ namespace ternary
         };
     }
 
+    Word tem(Word lhs, Word rhs)
+    {
+        return {
+            logical_multiply(lhs.high(), rhs.high()),
+            logical_multiply(lhs.middle(), rhs.middle()),
+            logical_multiply(lhs.low(), rhs.low())
+        };
+    }
+
     Word fdr(Word operand)
     {
         return {
@@ -380,6 +389,41 @@ namespace ternary
         };
     }
 
-    Word bin(Word operand);
-    Word tri(Word operand);
+    Word bin(Word operand)
+    {
+        Word::trit_container result;
+
+        for (auto i = 0; i < Word::word_size; ++i)
+        {
+            result[i] = (operand.value() >> i) & 1;
+        }
+
+        return { to_decimal(result) };
+    }
+
+    Word tri(Word operand)
+    {
+        auto sign { operand.high().trits()[Hexad::width - 1] == -1 ? -1 : 1};
+
+        int16_t result { 0 };
+
+        Word::trit_container trits;
+        auto ht { operand.high().trits() };
+        auto mt { operand.middle().trits() };
+        auto lt { operand.low().trits() };
+
+        std::copy(lt.begin(), lt.end(), trits.begin());
+        std::copy(mt.begin(), mt.end(), trits.begin()+Word::middle_power);
+        std::copy(ht.begin(), ht.end(), trits.begin()+Word::high_power);
+
+        for (auto i = 0; i < 16; ++i)
+        {
+            if (trits[i] > -1)
+            {
+                result += trits[i] << i;
+            }
+        }
+
+        return { result * sign };
+    }
 }

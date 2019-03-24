@@ -200,6 +200,21 @@ namespace ternary {
         return { to_decimal(result) };
     }
 
+    Hexad logical_multiply(const Hexad lhs, const Hexad rhs)
+    {
+        const auto lt { lhs.trits() };
+        const auto rt { rhs.trits() };
+        auto result = Hexad::trit_container_type{};
+
+        // TODO: Look for a better way to write this
+        for (auto i = 0; i < result.size(); ++i)
+        {
+            result[i] = lt[i] * rt[i];
+        }
+
+        return { to_decimal(result) };
+    }
+
     Hexad forward_diode(const Hexad operand)
     {
         auto tr { operand.trits() };

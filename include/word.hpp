@@ -110,6 +110,7 @@ namespace ternary
     Word min(Word lhs, Word rhs);
     Word max(Word lhs, Word rhs);
     Word teq(Word lhs, Word rhs);
+    Word tem(Word lhs, Word rhs);
 
     Word fdr(Word operand);
     Word rdr(Word operand);

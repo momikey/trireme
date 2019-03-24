@@ -245,6 +245,18 @@ namespace ternary {
     Hexad logical_equality(const Hexad lhs, const Hexad rhs);
 
     /**
+     * @brief Return the tritwise multiplication of two hexads.
+     * Each trit in the result is the product of the corresponding
+     * trits in the operands. This is similar to binary AND, but
+     * in a different way than the "maximum" function.
+     * 
+     * @param lhs 
+     * @param rhs 
+     * @return Hexad 
+     */
+    Hexad logical_multiply(const Hexad lhs, const Hexad rhs);
+
+    /**
      * @brief Return the given hexad with all negative trits changed to 0.
      * 
      * @param operand 
