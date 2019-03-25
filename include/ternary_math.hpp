@@ -160,6 +160,11 @@ constexpr Int clamp(Int value) noexcept
 template<typename Int = int>
 constexpr Int low_trits(Int value, std::size_t width) noexcept
 {
+    if (width < 1)
+    {
+        return 0;
+    }
+    
     const auto power = pow3<Int>(width);
     const auto halfpower = power / 2;
 
