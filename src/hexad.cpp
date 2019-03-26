@@ -162,7 +162,7 @@ namespace ternary {
         auto result = Hexad::trit_container_type{};
 
         // TODO: Look for a better way to write this
-        for (auto i = 0; i < result.size(); ++i)
+        for (auto i = 0u; i < result.size(); ++i)
         {
             result[i] = std::min(lt[i], rt[i]);
         }
@@ -177,7 +177,7 @@ namespace ternary {
         auto result = Hexad::trit_container_type{};
 
         // TODO: Look for a better way to write this
-        for (auto i = 0; i < result.size(); ++i)
+        for (auto i = 0u; i < result.size(); ++i)
         {
             result[i] = std::max(lt[i], rt[i]);
         }
@@ -192,7 +192,7 @@ namespace ternary {
         auto result = Hexad::trit_container_type{};
 
         // TODO: Look for a better way to write this
-        for (auto i = 0; i < result.size(); ++i)
+        for (auto i = 0u; i < result.size(); ++i)
         {
             result[i] = (lt[i] == rt[i]) ? 1 : -1;
         }
@@ -207,7 +207,7 @@ namespace ternary {
         auto result = Hexad::trit_container_type{};
 
         // TODO: Look for a better way to write this
-        for (auto i = 0; i < result.size(); ++i)
+        for (auto i = 0u; i < result.size(); ++i)
         {
             result[i] = lt[i] * rt[i];
         }
