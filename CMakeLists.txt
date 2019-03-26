@@ -16,6 +16,8 @@ set(TRIREME_SOURCES src/hexad.cpp src/word.cpp)
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})
 
+add_compile_options(-Wall)
+
 add_library(libtrireme STATIC ${TRIREME_SOURCES})
 target_include_directories(libtrireme PRIVATE include)
 
