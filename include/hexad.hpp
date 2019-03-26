@@ -24,7 +24,7 @@ namespace ternary {
 
         using trit_container_type = std::array<value_type, width>;
         
-        constexpr Hexad(): value(0) {}
+        constexpr Hexad() = default;
         constexpr Hexad(value_type v_): value(low_trits(v_, width)) {}
 
         constexpr value_type get() const { return value; }
@@ -34,7 +34,7 @@ namespace ternary {
         std::string value_string() const noexcept;
 
     private:
-        value_type value;
+        value_type value {0};
     };
 
     // Arithmetic functions for hexads

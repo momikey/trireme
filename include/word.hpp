@@ -49,9 +49,9 @@ namespace ternary
         std::string value_string() const noexcept;
 
     private:
-        Hexad high_;
-        Hexad middle_;
-        Hexad low_;
+        Hexad high_ {};
+        Hexad middle_ {};
+        Hexad low_ {};
     };
 
     // Operations on Words
@@ -74,50 +74,50 @@ namespace ternary
     using shift_result = std::pair<Word, int>;
 
     // Arithmetic
-    addition_result add(Word lhs, Word rhs);
-    addition_result add(Word lhs, Word::value_type rhs);
-    addition_result sub(Word lhs, Word rhs);
-    addition_result sub(Word lhs, Word::value_type rhs);
+    addition_result add(const Word& lhs, Word rhs) noexcept;
+    addition_result add(const Word& lhs, Word::value_type rhs) noexcept;
+    addition_result sub(const Word& lhs, const Word& rhs) noexcept;
+    addition_result sub(const Word& lhs, Word::value_type rhs) noexcept;
 
-    multiplication_result mul(Word lhs, Word rhs);
-    multiplication_result mul(Word lhs, Word::value_type rhs);
+    multiplication_result mul(const Word& lhs, const Word& rhs) noexcept;
+    multiplication_result mul(const Word& lhs, Word::value_type rhs) noexcept;
 
-    division_result div(Word lhs, Word rhs);
-    division_result div(Word lhs, Word::value_type rhs);
-    division_result div(division_dividend lhs, Word rhs);
-    division_result div(division_dividend lhs, Word::value_type rhs);
+    division_result div(const Word& lhs, const Word& rhs) noexcept;
+    division_result div(const Word& lhs, Word::value_type rhs) noexcept;
+    division_result div(division_dividend lhs, const Word& rhs) noexcept;
+    division_result div(division_dividend lhs, Word::value_type rhs) noexcept;
 
     // Logical
-    shift_result shl(Word operand, Word places);
-    shift_result shl(Word operand, Word::value_type places);
-    shift_result shr(Word operand, Word places);
-    shift_result shr(Word operand, Word::value_type places);
+    shift_result shl(const Word& operand, const Word& places) noexcept;
+    shift_result shl(const Word& operand, Word::value_type places) noexcept;
+    shift_result shr(const Word& operand, const Word& places) noexcept;
+    shift_result shr(const Word& operand, Word::value_type places) noexcept;
 
-    shift_result rol(Word operand, Word places);
-    shift_result rol(Word operand, Word::value_type places);
-    shift_result ror(Word operand, Word places);
-    shift_result ror(Word operand, Word::value_type places);
+    shift_result rol(const Word& operand, const Word& places) noexcept;
+    shift_result rol(const Word& operand, Word::value_type places) noexcept;
+    shift_result ror(const Word& operand, const Word& places) noexcept;
+    shift_result ror(const Word& operand, Word::value_type places) noexcept;
 
-    shift_result rcl(Word operand, int carry, Word places);
-    shift_result rcl(Word operand, int carry, Word::value_type places);
-    shift_result rcr(Word operand, int carry, Word places);
-    shift_result rcr(Word operand, int carry, Word::value_type places);
+    shift_result rcl(const Word& operand, int carry, const Word& places) noexcept;
+    shift_result rcl(const Word& operand, int carry, Word::value_type places) noexcept;
+    shift_result rcr(const Word& operand, int carry, const Word& places) noexcept;
+    shift_result rcr(const Word& operand, int carry, Word::value_type places) noexcept;
 
-    Word sti(Word operand);
-    Word pti(Word operand);
-    Word nti(Word operand);
+    Word sti(const Word& operand) noexcept;
+    Word pti(const Word& operand) noexcept;
+    Word nti(const Word& operand) noexcept;
 
-    Word min(Word lhs, Word rhs);
-    Word max(Word lhs, Word rhs);
-    Word teq(Word lhs, Word rhs);
-    Word tem(Word lhs, Word rhs);
+    Word min(const Word& lhs, const Word& rhs) noexcept;
+    Word max(const Word& lhs, const Word& rhs) noexcept;
+    Word teq(const Word& lhs, const Word& rhs) noexcept;
+    Word tem(const Word& lhs, const Word& rhs) noexcept;
 
-    Word fdr(Word operand);
-    Word rdr(Word operand);
+    Word fdr(const Word& operand) noexcept;
+    Word rdr(const Word& operand) noexcept;
 
     // Conversion
-    Word bin(Word operand);
-    Word tri(Word operand);
+    Word bin(const Word& operand) noexcept;
+    Word tri(const Word& operand) noexcept;
 }
 
 #endif /* TRIREME_WORD_HPP */

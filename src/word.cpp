@@ -28,8 +28,13 @@ namespace ternary
         return result;
     }
 
-    addition_result add(Word lhs, Word rhs)
+    addition_result add(const Word& lhs, Word rhs) noexcept
     {
+        // Note: This is the only case where we *don't* use only
+        // const refs for Word arguments. We're effectively using
+        // the `rhs` as a temporary accumulator variable, so it
+        // can't be const. But we also don't want to change the
+        // original, so it has to be passed by value.
         Hexad low, middle, high;
         int lowc, midc, highc;
 
@@ -42,27 +47,27 @@ namespace ternary
         return { {high, middle, low}, highc };
     }
 
-    addition_result add(Word lhs, Word::value_type rhs)
+    addition_result add(const Word& lhs, Word::value_type rhs) noexcept
     {
         return add(lhs, { rhs });
     }
 
-    addition_result sub(Word lhs, Word rhs)
+    addition_result sub(const Word& lhs, const Word& rhs) noexcept
     {
         return add(lhs, sti(rhs));
     }
 
-    addition_result sub(Word lhs, Word::value_type rhs)
+    addition_result sub(const Word& lhs, Word::value_type rhs) noexcept
     {
         return add(lhs, { -rhs });
     }
 
-    multiplication_result mul(Word lhs, Word rhs)
+    multiplication_result mul(const Word& lhs, const Word& rhs) noexcept
     {
         return mul(lhs, rhs.value());
     }
 
-    multiplication_result mul(Word lhs, Word::value_type rhs)
+    multiplication_result mul(const Word& lhs, Word::value_type rhs) noexcept
     {
         long long result = lhs.value() * static_cast<long long>(rhs);
         return {
@@ -71,12 +76,12 @@ namespace ternary
         };
     }
 
-    division_result div(Word lhs, Word rhs)
+    division_result div(const Word& lhs, const Word& rhs) noexcept
     {
         return div(lhs, rhs.value());
     }
 
-    division_result div(Word lhs, Word::value_type rhs)
+    division_result div(const Word& lhs, Word::value_type rhs) noexcept
     {
         auto d { lhs.value() / rhs };
         auto r { lhs.value() % rhs };
@@ -84,12 +89,12 @@ namespace ternary
         return { {d}, {r} };
     }
 
-    division_result div(division_dividend lhs, Word rhs)
+    division_result div(division_dividend lhs, const Word& rhs) noexcept
     {
         return div(lhs, rhs.value());
     }
 
-    division_result div(division_dividend lhs, Word::value_type rhs)
+    division_result div(division_dividend lhs, Word::value_type rhs) noexcept
     {
         long long dividend = lhs.first.value() * pow3<long long>(Word::word_size) + lhs.second.value();
 
@@ -104,12 +109,12 @@ namespace ternary
         };
     }
 
-    shift_result shl(Word operand, Word places)
+    shift_result shl(const Word& operand, const Word& places) noexcept
     {
         return shl(operand, places.value());
     }
 
-    shift_result shl(Word operand, Word::value_type places)
+    shift_result shl(const Word& operand, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -137,12 +142,12 @@ namespace ternary
         return { { to_decimal(trits) }, carry };
     }
 
-    shift_result shr(Word operand, Word places)
+    shift_result shr(const Word& operand, const Word& places) noexcept
     {
         return shr(operand, places.value());
     }
 
-    shift_result shr(Word operand, Word::value_type places)
+    shift_result shr(const Word& operand, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -174,12 +179,12 @@ namespace ternary
         return { { to_decimal(trits) }, carry };
     }
 
-    shift_result rol(Word operand, Word places)
+    shift_result rol(const Word& operand, const Word& places) noexcept
     {
         return rol(operand, places.value());
     }
 
-    shift_result rol(Word operand, Word::value_type places)
+    shift_result rol(const Word& operand, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -206,12 +211,12 @@ namespace ternary
         return { { to_decimal(trits) }, 0 };
     }
 
-    shift_result ror(Word operand, Word places)
+    shift_result ror(const Word& operand, const Word& places) noexcept
     {
         return ror(operand, places.value());
     }
 
-    shift_result ror(Word operand, Word::value_type places)
+    shift_result ror(const Word& operand, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -238,12 +243,12 @@ namespace ternary
         return { { to_decimal(trits) }, 0 };
     }
 
-    shift_result rcl(Word operand, int carry, Word places)
+    shift_result rcl(const Word& operand, int carry, const Word& places) noexcept
     {
         return rcl(operand, carry, places.value());
     }
 
-    shift_result rcl(Word operand, int carry, Word::value_type places)
+    shift_result rcl(const Word& operand, int carry, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -273,12 +278,12 @@ namespace ternary
         return { { to_decimal(trits) }, carry };
     }
 
-    shift_result rcr(Word operand, int carry, Word places)
+    shift_result rcr(const Word& operand, int carry, const Word& places) noexcept
     {
         return rcr(operand, carry, places.value());
     }
 
-    shift_result rcr(Word operand, int carry, Word::value_type places)
+    shift_result rcr(const Word& operand, int carry, Word::value_type places) noexcept
     {
         if (places > Word::word_size + 1)
         {
@@ -308,7 +313,7 @@ namespace ternary
         return { { to_decimal(trits) }, carry };
     }
 
-    Word sti(Word operand)
+    Word sti(const Word& operand) noexcept
     {
         return {
             invert(operand.high()),
@@ -317,7 +322,7 @@ namespace ternary
         };
     }
 
-    Word pti(Word operand)
+    Word pti(const Word& operand) noexcept
     {
         return {
             positive_invert(operand.high()),
@@ -326,7 +331,7 @@ namespace ternary
         };
     }
 
-    Word nti(Word operand)
+    Word nti(const Word& operand) noexcept
     {
         return {
             negative_invert(operand.high()),
@@ -335,7 +340,7 @@ namespace ternary
         };
     }
 
-    Word min(Word lhs, Word rhs)
+    Word min(const Word& lhs, const Word& rhs) noexcept
     {
         return {
             trit_minimum(lhs.high(), rhs.high()),
@@ -344,7 +349,7 @@ namespace ternary
         };
     }
 
-    Word max(Word lhs, Word rhs)
+    Word max(const Word& lhs, const Word& rhs) noexcept
     {
         return {
             trit_maximum(lhs.high(), rhs.high()),
@@ -353,7 +358,7 @@ namespace ternary
         };
     }
     
-    Word teq(Word lhs, Word rhs)
+    Word teq(const Word& lhs, const Word& rhs) noexcept
     {
         return {
             logical_equality(lhs.high(), rhs.high()),
@@ -362,7 +367,7 @@ namespace ternary
         };
     }
 
-    Word tem(Word lhs, Word rhs)
+    Word tem(const Word& lhs, const Word& rhs) noexcept
     {
         return {
             logical_multiply(lhs.high(), rhs.high()),
@@ -371,7 +376,7 @@ namespace ternary
         };
     }
 
-    Word fdr(Word operand)
+    Word fdr(const Word& operand) noexcept
     {
         return {
             forward_diode(operand.high()),
@@ -380,7 +385,7 @@ namespace ternary
         };
     }
 
-    Word rdr(Word operand)
+    Word rdr(const Word& operand) noexcept
     {
         return {
             reverse_diode(operand.high()),
@@ -389,7 +394,7 @@ namespace ternary
         };
     }
 
-    Word bin(Word operand)
+    Word bin(const Word& operand) noexcept
     {
         Word::trit_container result;
 
@@ -401,7 +406,7 @@ namespace ternary
         return { to_decimal(result) };
     }
 
-    Word tri(Word operand)
+    Word tri(const Word& operand) noexcept
     {
         auto sign { operand.high().trits()[Hexad::width - 1] == -1 ? -1 : 1};
 
