@@ -20,9 +20,9 @@ namespace ternary
         using trit_container_with_carry = std::array<value_type, word_size+1>;
 
         Word(Word::value_type v):
-            low_(low_trits(v, middle_power)),
+            high_(shift_right(v, high_power)),
             middle_(low_trits(shift_right(v, middle_power), middle_power)),
-            high_(shift_right(v, high_power))
+            low_(low_trits(v, middle_power))
         {}
 
         Word(value_type hi, value_type mid, value_type lo):
