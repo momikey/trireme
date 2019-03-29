@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <array>
+#include <utility>
 
 #include "hexad.hpp"
 
@@ -61,7 +62,87 @@ BOOST_FIXTURE_TEST_SUITE(hexad, HexadFixture)
 
     BOOST_AUTO_TEST_SUITE_END()
 
-    BOOST_AUTO_TEST_SUITE(hexad_operations)
+    BOOST_AUTO_TEST_SUITE(hexad_operations_arithmetic)
+
+    BOOST_AUTO_TEST_CASE(operation_add)
+    {
+        BOOST_TEST(add(smallPositive, largePositive).get() == smallPositive.get() + largePositive.get());
+        BOOST_TEST(add(smallNegative, largeNegative).get() == smallNegative.get() + largeNegative.get());
+        BOOST_TEST(add(smallPositive, smallNegative).get() == smallPositive.get() + smallNegative.get());
+        BOOST_TEST(add(smallNegative, largePositive).get() == smallNegative.get() + largePositive.get());
+    }
+    
+    BOOST_AUTO_TEST_CASE(operation_subtract)
+    {
+        BOOST_TEST(subtract(smallPositive, largePositive).get() == smallPositive.get() - largePositive.get());
+        BOOST_TEST(subtract(smallNegative, largeNegative).get() == smallNegative.get() - largeNegative.get());
+        BOOST_TEST(subtract(smallPositive, smallNegative).get() == smallPositive.get() - smallNegative.get());
+        BOOST_TEST(subtract(smallNegative, largePositive).get() == smallNegative.get() - largePositive.get());
+    }
+    
+    BOOST_AUTO_TEST_CASE(operation_add_with_carry)
+    {
+        auto r { Hexad::range };
+        BOOST_TEST(add_with_carry(smallPositive, smallNegative).first.get() == smallPositive.get() + smallNegative.get());
+        BOOST_TEST(add_with_carry(largePositive, largePositive).second == 1);
+        BOOST_TEST(add_with_carry(largeNegative, largeNegative).first.get() - r == largeNegative.get() + largeNegative.get());
+    }
+    
+    BOOST_AUTO_TEST_CASE(operation_subtract_with_carry)
+    {
+        BOOST_TEST(subtract_with_carry(smallPositive, smallNegative).first.get() == smallPositive.get() - smallNegative.get());
+        BOOST_TEST(subtract_with_carry(largePositive, largeNegative).second == 1);
+    }
+
+    BOOST_AUTO_TEST_CASE(operation_multiply)
+    {
+        BOOST_TEST(multiply(smallPositive, smallNegative).first.get() == smallPositive.get() * smallNegative.get());
+
+        auto mp { multiply(largePositive, smallPositive) };
+        auto r { Hexad::range };
+        BOOST_TEST(mp.second.get() * r + mp.first.get() == largePositive.get() * smallPositive.get());
+    }
+
+    BOOST_AUTO_TEST_CASE(operation_divide_single_precision)
+    {
+        auto d1 { divide(largePositive, smallPositive) };
+        BOOST_TEST(d1.first.get() == largePositive.get() / smallPositive.get());
+        BOOST_TEST(d1.second.get() == largePositive.get() % smallPositive.get());
+        
+        auto d2 { divide(largePositive, smallNegative) };
+        BOOST_TEST(d2.first.get() == largePositive.get() / smallNegative.get());
+        BOOST_TEST(d2.second.get() == largePositive.get() % smallNegative.get());
+        
+        auto d3 { divide(largeNegative, smallPositive) };
+        BOOST_TEST(d3.first.get() == largeNegative.get() / smallPositive.get());
+        BOOST_TEST(d3.second.get() == largeNegative.get() % smallPositive.get());
+        
+        auto d4 { divide(largeNegative, smallNegative) };
+        BOOST_TEST(d4.first.get() == largeNegative.get() / smallNegative.get());
+        BOOST_TEST(d4.second.get() == largeNegative.get() % smallNegative.get());
+    }
+
+    BOOST_AUTO_TEST_CASE(operation_divide_double_precision)
+    {
+        std::pair<Hexad, Hexad> hh { {0}, {1} };
+        auto hhvalue { hh.second.get() * Hexad::range + hh.first.get() };
+
+        BOOST_TEST(divide(hh, smallPositive).first.get() == hhvalue / smallPositive.get());
+        BOOST_TEST(divide(hh, smallNegative).first.get() == hhvalue / smallNegative.get());
+    }
+
+    BOOST_AUTO_TEST_SUITE_END()
+
+    BOOST_AUTO_TEST_SUITE(hexad_operations_logical)
+
+    BOOST_AUTO_TEST_CASE(operation_left_shift_single)
+    {
+        auto r { Hexad::range };
+        BOOST_TEST(left_shift(smallPositive).get() == smallPositive.get() * 3);
+        BOOST_TEST(left_shift(largePositive).get() == largePositive.get() * 3 - r);
+        BOOST_TEST(left_shift(largeNegative).get() == largeNegative.get() * 3 -+ r);
+    }
+      
 
     BOOST_AUTO_TEST_SUITE_END()
 
