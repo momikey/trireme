@@ -17,6 +17,7 @@ set(TRIREME_INCLUDES
     include/word.hpp
     include/registers.hpp
     include/memory.hpp
+    include/opcode.hpp
 )
 
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
@@ -26,6 +27,7 @@ set(TRIREME_SOURCES
     src/word.cpp
     src/registers.cpp
     src/memory.cpp
+    src/opcode.cpp
 )
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})

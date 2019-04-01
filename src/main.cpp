@@ -5,7 +5,7 @@
 #include "ternary_math.hpp"
 #include "hexad.hpp"
 #include "word.hpp"
-#include "memory.hpp"
+#include "opcode.hpp"
 
 using namespace ternary;
 
@@ -35,10 +35,10 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
 }
 
 int main(int, char**) {
-    BasicMemory r;
+    Opcode n { 1234567890 };
 
-    for (auto i = -13; i <= 13; ++i)
-    {
-        std::cout << i << '\t' << r.get(i) << '\n';
-    }
+    std::cout << n.get() << '\n';
+    std::cout << n.o_field() << '\t' << n.m_field() << '\t' << n.t_field() << '\t'
+              << n.x_field() << '\t' << n.y_field() << '\t' << n.z_field() << '\n';
+    std::cout << n.low6() << '\t' << n.low9() << '\t' << n.low12() << '\n';
 }
