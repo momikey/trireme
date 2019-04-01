@@ -10,9 +10,23 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
-set(TRIREME_INCLUDES include/convert.hpp include/ternary_math.hpp include/hexad.hpp include/word.hpp)
+set(TRIREME_INCLUDES
+    include/convert.hpp
+    include/ternary_math.hpp
+    include/hexad.hpp
+    include/word.hpp
+    include/registers.hpp
+    include/memory.hpp
+)
+
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
-set(TRIREME_SOURCES src/hexad.cpp src/word.cpp)
+
+set(TRIREME_SOURCES
+    src/hexad.cpp
+    src/word.cpp
+    src/registers.cpp
+    src/memory.cpp
+)
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})
 

@@ -5,6 +5,7 @@
 #include "ternary_math.hpp"
 #include "hexad.hpp"
 #include "word.hpp"
+#include "memory.hpp"
 
 using namespace ternary;
 
@@ -34,12 +35,10 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
 }
 
 int main(int, char**) {
-    Word ww1 { 12345 };
-    Word ww2 { -1234 };
+    BasicMemory r;
 
-    std::cout << bin(ww2) << '\n';
-
-    Word b { -64 };
-
-    std::cout << b << tri(bin(b)) << '\n';
+    for (auto i = -13; i <= 13; ++i)
+    {
+        std::cout << i << '\t' << r.get(i) << '\n';
+    }
 }
