@@ -19,26 +19,26 @@ namespace ternary
         using trit_container = std::array<value_type, word_size>;
         using trit_container_with_carry = std::array<value_type, word_size+1>;
 
-        Word() = default;
+        constexpr Word() = default;
 
-        Word(Word::value_type v):
+        constexpr Word(Word::value_type v):
             high_(shift_right(v, high_power)),
             middle_(low_trits(shift_right(v, middle_power), middle_power)),
             low_(low_trits(v, middle_power))
         {}
 
-        Word(value_type hi, value_type mid, value_type lo):
+        constexpr Word(value_type hi, value_type mid, value_type lo):
             high_(hi), middle_(mid), low_(lo) {}
 
-        Word(Hexad hi, Hexad mid, Hexad lo):
+        constexpr Word(Hexad hi, Hexad mid, Hexad lo):
             high_(hi), middle_(mid), low_(lo) {}
         
-        value_type value() const noexcept
+        constexpr value_type value() const noexcept
             { return high_.get() * pow3(high_power) + middle_.get() * pow3(middle_power) + low_.get(); }
 
-        Hexad low() const noexcept { return low_; }
-        Hexad middle() const noexcept { return middle_; }
-        Hexad high() const noexcept { return high_; }
+        constexpr Hexad low() const noexcept { return low_; }
+        constexpr Hexad middle() const noexcept { return middle_; }
+        constexpr Hexad high() const noexcept { return high_; }
 
         void set_low(Hexad l) noexcept { low_ = l; }
         void set_low(value_type l) noexcept { low_ = l; }

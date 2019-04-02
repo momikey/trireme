@@ -5,7 +5,7 @@
 #include "ternary_math.hpp"
 #include "hexad.hpp"
 #include "word.hpp"
-#include "opcode.hpp"
+#include "flags.hpp"
 
 using namespace ternary;
 
@@ -35,10 +35,14 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
 }
 
 int main(int, char**) {
-    Opcode n { 1234567890 };
+    Flags f {};
 
-    std::cout << n.get() << '\n';
-    std::cout << n.o_field() << '\t' << n.m_field() << '\t' << n.t_field() << '\t'
-              << n.x_field() << '\t' << n.y_field() << '\t' << n.z_field() << '\n';
-    std::cout << n.low6() << '\t' << n.low9() << '\t' << n.low12() << '\n';
+    std::cout << f.get() << '\n';
+    f.set_C(1);
+    std::cout << f.get() << '\t' << f.get_C() << '\n';
+    f.set_S(-1);
+    std::cout << f.get() << '\t' << f.get_S() << '\n';
+
+    f.set_C(0);
+    std::cout << f.get() << '\t' << f.get_C() << '\n';
 }

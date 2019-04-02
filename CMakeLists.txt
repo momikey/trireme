@@ -18,6 +18,7 @@ set(TRIREME_INCLUDES
     include/registers.hpp
     include/memory.hpp
     include/opcode.hpp
+    include/flags.hpp
 )
 
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
