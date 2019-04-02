@@ -11,6 +11,11 @@ namespace ternary
      */
     Word Registers::get(int r) const noexcept
     {
+        if (r == zero_register)
+        {
+            return 0;
+        }
+
         if (r >= 0)
         {
             return general[clamp_address(r)];
@@ -29,6 +34,11 @@ namespace ternary
      */
     void Registers::set(int r, const Word& w) noexcept
     {
+        if (r == zero_register)
+        {
+            return;
+        }
+        
         if (r == 0)
         {
             general[clamp_address(r)] = w.value();

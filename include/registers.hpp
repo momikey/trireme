@@ -16,6 +16,10 @@ namespace ternary
         static constexpr auto address_width = 3;
         static constexpr auto register_count = pow3(address_width);
 
+        // In the basic architecture, register -13 is fixed.
+        // It always reads as 0, and writes are discarded.
+        static constexpr auto zero_register = -13;
+
         Registers() = default;
 
         Word get(int r) const noexcept;
