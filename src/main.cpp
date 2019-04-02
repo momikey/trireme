@@ -5,7 +5,8 @@
 #include "ternary_math.hpp"
 #include "hexad.hpp"
 #include "word.hpp"
-#include "flags.hpp"
+
+#include "assembler/assembler.hpp"
 
 using namespace ternary;
 
@@ -35,14 +36,5 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
 }
 
 int main(int, char**) {
-    Flags f {};
-
-    std::cout << f.get() << '\n';
-    f.set_C(1);
-    std::cout << f.get() << '\t' << f.get_C() << '\n';
-    f.set_S(-1);
-    std::cout << f.get() << '\t' << f.get_S() << '\n';
-
-    f.set_C(0);
-    std::cout << f.get() << '\t' << f.get_C() << '\n';
+    std::cout << dummy() << '\n';
 }

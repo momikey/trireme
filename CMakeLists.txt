@@ -38,9 +38,11 @@ add_compile_options(-Wall)
 add_library(libtrireme STATIC ${TRIREME_SOURCES})
 target_include_directories(libtrireme PRIVATE include)
 
+add_subdirectory(src/assembler)
+
 add_executable(trireme src/main.cpp)
 target_include_directories(trireme PRIVATE include)
-target_link_libraries(trireme libtrireme)
+target_link_libraries(trireme libtrireme trireme_assembler)
 
 set(TRIREME_TESTS tests/ternary_math_test.cpp tests/convert_test.cpp tests/hexad_test.cpp)
 add_executable(trireme_test tests/testmain.cpp ${TRIREME_TESTS})
