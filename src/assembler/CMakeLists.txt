@@ -4,7 +4,8 @@ set(DIR_SOURCES
 
 set(DIR_INCLUDES
     assembler.hpp
+    detail/grammar.hpp
 )
 
 add_library(trireme_assembler STATIC ${DIR_SOURCES})
-target_include_directories(trireme_assembler PRIVATE ../../include/)
+target_include_directories(trireme_assembler PRIVATE ../../include/ ../../thirdparty/include)
