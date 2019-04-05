@@ -3,11 +3,33 @@
 
 #include <cstdlib>
 #include <array>
+#include <functional>
+#include <numeric>
+#include <iterator>
 
 #include "../ternary_math.hpp"
 
 namespace detail
 {
+    // Positive triads use capital letters
+    constexpr std::array<char, 13> positive {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'
+    };
+
+    // Negative triads use lowercase letters
+    constexpr std::array<char, 13> negative {
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+    };
+
+    template<std::size_t... Is>
+    constexpr auto generate_powers_27(std::index_sequence<Is...>) noexcept
+        -> std::array<int, sizeof...(Is)>
+    {
+        return { {pow3(3*Is)... }};
+    }
+
+    constexpr auto powers_of_27 { generate_powers_27(std::make_index_sequence<6>{}) };
+
     template<typename Int, std::size_t Size>
     constexpr Int to_decimal_impl(const std::array<Int, Size>& arr, std::size_t level) noexcept
     {
@@ -26,16 +48,6 @@ namespace detail
     template<typename Int = int>
     std::string triad_to_string_impl(Int value) noexcept
     {
-        // Positive triads use capital letters
-        const std::array<int, 13> positive {
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'
-        };
-
-        // Negative triads use lowercase letters
-        const std::array<int, 13> negative {
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        };
-
         if (abs_c(value) > 13)
         {
             // Out of range, so return an empty string
@@ -59,7 +71,6 @@ namespace detail
                 return {"0"};
             }
         }
-        
     }
 }
 
