@@ -25,7 +25,7 @@ namespace detail {
     }
 
     template<typename Int = int>
-    Int string_to_value(const std::string& st) noexcept
+    Int string_to_value_impl(const std::string& st) noexcept
     {
         if (st.length() > powers_of_27.size())
         {

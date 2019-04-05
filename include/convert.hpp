@@ -8,6 +8,7 @@
 
 #include "ternary_math.hpp"
 #include "detail/convert_impl.hpp"
+#include "detail/character_to_value.hpp"
 
 /**
  * @brief Converts an array of balanced trits to their decimal value.
@@ -18,7 +19,7 @@
  * @return constexpr Int The decimal value of the balanced ternary digits
  */
 template<typename Int, std::size_t Size>
-constexpr Int to_decimal(const std::array<Int, Size>& arr) noexcept
+inline constexpr Int to_decimal(const std::array<Int, Size>& arr) noexcept
 {
     return detail::to_decimal_impl(arr, Size-1);
 }
@@ -32,7 +33,7 @@ constexpr Int to_decimal(const std::array<Int, Size>& arr) noexcept
  * @return constexpr std::array<Int, Size> An array of trits, each in the set {1,0,-1}
  */
 template<typename Int, std::size_t Size>
-constexpr std::array<Int, Size> to_trits(Int value) noexcept
+inline constexpr std::array<Int, Size> to_trits(Int value) noexcept
 {
     return detail::to_trits_impl(value, std::make_index_sequence<Size>{});
 }
@@ -49,9 +50,15 @@ constexpr std::array<Int, Size> to_trits(Int value) noexcept
  * @return std::string A 1-character string following the scheme above
  */
 template<typename Int = int>
-std::string triad_to_string(Int value) noexcept
+inline std::string triad_to_string(Int value) noexcept
 {
     return detail::triad_to_string_impl(value);
+}
+
+template<typename Int = int>
+inline Int string_to_value(const std::string& st) noexcept
+{
+    return detail::string_to_value_impl(st);
 }
 
 #endif /* TRIREME_CONVERT_HPP */
