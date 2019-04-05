@@ -49,7 +49,7 @@ namespace ternary
 
     addition_result add(const Word& lhs, Word::value_type rhs) noexcept
     {
-        return add(lhs, { rhs });
+        return add(lhs, Word{ rhs });
     }
 
     addition_result sub(const Word& lhs, const Word& rhs) noexcept
@@ -59,7 +59,7 @@ namespace ternary
 
     addition_result sub(const Word& lhs, Word::value_type rhs) noexcept
     {
-        return add(lhs, { -rhs });
+        return add(lhs, Word{ -rhs });
     }
 
     multiplication_result mul(const Word& lhs, const Word& rhs) noexcept
