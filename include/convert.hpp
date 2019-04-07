@@ -55,6 +55,18 @@ inline std::string triad_to_string(Int value) noexcept
     return detail::triad_to_string_impl(value);
 }
 
+/**
+ * @brief Converts a string in base-27 notation into an integer.
+ * Calculates (to_number(c) * 27**k) for the character at place k,
+ * maximum of 6. The to_number function produces the following results:
+ * * '0' -> 0
+ * * 'A' to 'M' -> +1 to +13
+ * * 'n' to 'z' -> -1 to -13
+ * 
+ * @tparam int 
+ * @param st 
+ * @return Int 
+ */
 template<typename Int = int>
 inline Int string_to_value(const std::string& st) noexcept
 {
