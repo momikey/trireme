@@ -1,7 +1,6 @@
 #ifndef TRIREME_CONVERT_IMPL_HPP
 #define TRIREME_CONVERT_IMPL_HPP
 
-#include <cstdlib>
 #include <array>
 #include <functional>
 #include <numeric>
