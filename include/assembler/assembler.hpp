@@ -21,7 +21,7 @@ namespace ternary { namespace assembler {
         return tao::pegtl::parse<
             grammar,
             action
-            ,tracer
+            // ,tracer
             >
             (in, st);
     }
