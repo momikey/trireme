@@ -88,6 +88,7 @@ namespace ternary { namespace assembler {
             s.z = static_cast<int>(f);
             s.t = s.x = s.y = 0;
         }
+
     }
 
     // Actions for assembler instructions
@@ -681,6 +682,195 @@ namespace ternary { namespace assembler {
         {
             s.op = "snp";
             return detail::skip_flag_negative<Flags::protect>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_inc>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // INC rX 0++ ++- RRR 000 000 00+
+            s.o = 4;
+            s.m = 11;
+            s.z = 1;
+            s.x = s.y = 0;
+            s.op = "inc";
+        }
+    };
+
+    template<>
+    struct action<in_dec>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // DEC rX 0++ -0+ RRR 000 000 00+
+            s.o = 4;
+            s.m = -8;
+            s.x = s.y = 0;
+            s.op = "dec";
+        }
+    };
+
+    template<>
+    struct action<in_clr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CLR rX +0- 00+ 000 000 XXX 000
+            s.o = 8;
+            s.m = 1;
+            s.t = 0;
+            s.x = s.z = 0;
+            s.op = "clr";
+        }
+    };
+
+    template<>
+    struct action<in_srz> : action<in_clr> {};
+
+    template<>
+    struct action<in_srp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // SRP rX +0- 00+ 00+ 000 XXX 000
+            s.o = 8;
+            s.m = 1;
+            s.t = 1;
+            s.x = s.z = 0;
+            s.op = "srp";
+        }
+    };
+    
+    template<>
+    struct action<in_srn>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // SRN rX +0- 00+ 00- 000 XXX 000
+            s.o = 8;
+            s.m = 1;
+            s.t = -1;
+            s.x = s.z = 0;
+            s.op = "srp";
+        }
+    };
+
+    template<>
+    struct action<in_psh>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // PSH rX +0- +++ 000 000 000 XXX
+            s.o = 8;
+            s.m = 13;
+            s.t = s.x = s.y = 0;
+            s.op = "psh";
+        }
+    };
+
+    template<>
+    struct action<in_pop>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // POP rX +0- ++- 000 000 000 XXX
+            s.o = 8;
+            s.m = 11;
+            s.t = s.x = s.y = 0;
+            s.op = "pop";
+        }
+    };
+
+    template<>
+    struct action<in_sti>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // STI rX 00+ 000 000 000 000 RRR
+            s.o = 1;
+            s.m = 0;
+            s.t = s.x = s.y = 0;
+            s.op = "sti";
+        }
+    };
+
+    template<>
+    struct action<in_not> : action<in_sti> {};
+
+    template<>
+    struct action<in_neg> : action<in_sti> {};
+
+    template<>
+    struct action<in_pti>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // PTI rX 00+ 00+ 000 000 000 RRR
+            s.o = 1;
+            s.m = 1;
+            s.t = s.x = s.y = 0;
+            s.op = "pti";
+        }
+    };
+
+    template<>
+    struct action<in_nti>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // NTI rX 00+ 00- 000 000 000 RRR
+            s.o = 1;
+            s.m = -1;
+            s.t = s.x = s.y = 0;
+            s.op = "nti";
+        }
+    };
+
+    template<>
+    struct action<logical_single_t>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Put single operand in T field of opcode
+            s.t = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<logical_single_y>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Put single operand in Y field of opcode
+            s.y = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<logical_single_z>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Put single operand in Z field of opcode
+            s.z = s.operands.front();
+            s.operands.pop();
         }
     };
 

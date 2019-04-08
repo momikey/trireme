@@ -3,6 +3,8 @@
 
 #include <tao/pegtl.hpp>
 
+#include "tokens.hpp"
+
 namespace ternary { namespace assembler {
     using namespace tao::pegtl;
 
@@ -220,6 +222,58 @@ namespace ternary { namespace assembler {
         TAO_PEGTL_KEYWORD("snp")
     {};
 
+    struct in_inc :
+        TAO_PEGTL_KEYWORD("inc")
+    {};
+    
+    struct in_dec :
+        TAO_PEGTL_KEYWORD("dec")
+    {};
+    
+    struct in_neg :
+        TAO_PEGTL_KEYWORD("neg")
+    {};
+    
+    struct in_clr :
+        TAO_PEGTL_KEYWORD("clr")
+    {};
+    
+    struct in_srp :
+        TAO_PEGTL_KEYWORD("srp")
+    {};
+    
+    struct in_srn :
+        TAO_PEGTL_KEYWORD("srn")
+    {};
+    
+    struct in_srz :
+        TAO_PEGTL_KEYWORD("srz")
+    {};
+    
+    struct in_psh :
+        TAO_PEGTL_KEYWORD("psh")
+    {};
+    
+    struct in_pop :
+        TAO_PEGTL_KEYWORD("pop")
+    {};
+    
+    struct in_sti :
+        TAO_PEGTL_KEYWORD("sti")
+    {};
+    
+    struct in_pti :
+        TAO_PEGTL_KEYWORD("pti")
+    {};
+    
+    struct in_nti :
+        TAO_PEGTL_KEYWORD("nti")
+    {};
+    
+    struct in_not :
+        TAO_PEGTL_KEYWORD("not")
+    {};
+
     struct flag_positive :
         sor<
             in_pfc,
@@ -298,7 +352,7 @@ namespace ternary { namespace assembler {
         >
     {};
     
-    struct no_operand:
+    struct no_operand :
         sor<
             in_ret,
             in_srt,
@@ -314,9 +368,57 @@ namespace ternary { namespace assembler {
         >
     {};
 
-    struct instruction:
+    struct logical_single_t :
+        seq<
+            sor<
+                in_inc
+            >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct logical_single_y :
+        seq<
+            sor<
+                in_clr,
+                in_srp,
+                in_srn,
+                in_srz
+            >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct logical_single_z :
+        seq<
+            sor<
+                in_psh,
+                in_pop,
+                in_sti,
+                in_pti,
+                in_nti,
+                in_not,
+                in_neg
+            >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct logical_single :
         sor<
-            no_operand
+            logical_single_t,
+            logical_single_y,
+            logical_single_z
+        >
+    {};
+
+    struct instruction :
+        sor<
+            no_operand,
+            logical_single
         >
     {};
 }}

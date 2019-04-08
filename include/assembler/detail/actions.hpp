@@ -49,6 +49,8 @@ namespace ternary { namespace assembler {
             std::string regnum { in.begin()+1, in.end() };
             s.converted = string_to_value(regnum);
 
+            s.operands.push(s.converted);
+
             std::clog << "Register " << regnum << '\n';
         }
     };

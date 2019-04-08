@@ -1,6 +1,7 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <queue>
 
 #include "convert.hpp"
 #include "ternary_math.hpp"
@@ -43,6 +44,7 @@ struct test_state
     int converted;
     int o,m,t,x,y,z;
     std::string op;
+    std::queue<int> operands {};
 };
 
 
