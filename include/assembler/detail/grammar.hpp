@@ -49,7 +49,7 @@ namespace ternary { namespace assembler
     struct grammar :
         plus<
             if_must<
-                operand,
+                instruction,
                 sor<
                     eolf,
                     ignored

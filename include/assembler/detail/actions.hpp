@@ -7,10 +7,14 @@
 #include <string>
 
 #include "grammar.hpp"
-#include "convert.hpp"
+#include "../../convert.hpp"
+#include "../../ternary_math.hpp"
 
 namespace ternary { namespace assembler {
     using namespace tao::pegtl;
+
+    constexpr auto io_width = 9;
+    constexpr auto syscall_width = 6;
 
     // A do-nothing action we can use as a base
     template<typename Rule>
@@ -19,16 +23,6 @@ namespace ternary { namespace assembler {
     template<>
     struct action<integer> : public tao::pegtl::integer::signed_action
     {};
-
-    template<>
-    struct action<number>
-    {
-        template<typename Input, typename State>
-        static void apply(const Input& in, State& s)
-        {
-            std::clog << in.string() << '\t' << s.converted << '\n';
-        }
-    };
 
     template<>
     struct action<balanced_integer>
@@ -41,6 +35,26 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<immediate_6>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.push(low_trits(s.converted, 6));
+        }
+    };
+
+    template<>
+    struct action<immediate_9>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.push(low_trits(s.converted, 9));
+        }
+    };
+    
+    template<>
     struct action<cpu_register>
     {
         template<typename Input, typename State>
@@ -50,8 +64,33 @@ namespace ternary { namespace assembler {
             s.converted = string_to_value(regnum);
 
             s.operands.push(s.converted);
+        }
+    };
+    
+    template<>
+    struct action<system_call_vector>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // std::string vecnum { in.begin()+1, in.end() };
+            // s.converted = string_to_value(vecnum);
 
-            std::clog << "Register " << regnum << '\n';
+            s.operands.push(low_trits(s.converted, syscall_width));
+        }
+    };
+
+    template<>
+    struct action<io_address>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // std::string ioaddr { in.begin()+1, in.end() };
+            // std::clog << "Found: " << ioaddr << '\n';
+            // s.converted = string_to_value(ioaddr);
+
+            s.operands.push(low_trits(s.converted, io_width));
         }
     };
 

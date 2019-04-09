@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "instructions.hpp"
+#include "../../ternary_math.hpp"
 
 namespace ternary { namespace assembler {
     using namespace tao::pegtl;
@@ -839,6 +840,310 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_mov>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // MOV rX, rY +0- 00- ... ... XXX YYY
+            s.o = 8;
+            s.m = -1;
+            s.t = s.x = 0;
+            s.op = "mov";
+        }
+    };
+
+    template<>
+    struct action<in_xch>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // XCH rX, rY +0- 0-- ... ... XXX YYY
+            s.o = 8;
+            s.m = -4;
+            s.t = s.x = 0;
+            s.op = "xch";
+        }
+    };
+
+    template<>
+    struct action<in_cmp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CMP rX, rY 00+ -00 ... ... XXX YYY
+            s.o = 1;
+            s.m  = -9;
+            s.t = s.x = 0;
+            s.op = "cmp";
+        }
+    };
+
+    template<>
+    struct action<in_bin>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BIN rX, rY 0+- 00+ ... ... XXX YYY
+            s.o = 2;
+            s.m = 1;
+            s.t = s.x = 0;
+            s.op = "bin";
+        }
+    };
+
+    template<>
+    struct action<in_tri>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // TRI rX, rY 0+- 00- ... ... XXX YYY
+            s.o = 2;
+            s.m = -1;
+            s.t = s.x = 0;
+            s.op = "tri";
+        }
+    };
+
+    template<>
+    struct action<in_fdr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // FDR rX, rY 0+- 0++ ... ... XXX YYY
+            s.o = 2;
+            s.m = 4;
+            s.t = s.x = 0;
+            s.op = "fdr";
+        }
+    };
+
+    template<>
+    struct action<in_rdr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // RDR rX, rY 0+- 0+- ... ... XXX YYY
+            s.o = 2;
+            s.m = 2;
+            s.t = s.x = 0;
+            s.op = "rdr";
+        }
+    };
+
+    template<>
+    struct action<in_brr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BRR rX +0+ 0+0 ... ... ... RRR
+            s.o = 10;
+            s.m = 3;
+            s.t = s.x = s.y = 0;
+            s.op = "brr";
+        }
+    };
+
+    template<>
+    struct action<in_caa>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CAA rX +0+ 0-0 ... ... ... RRR
+            s.o = 10;
+            s.m = 3;
+            s.t = s.x = s.y = 0;
+            s.op = "caa";
+        }
+    };
+
+    template<>
+    struct action<in_sys>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // SYS #vec 000 +++ ... ... VVV VVV
+            s.o = 0;
+            s.m = 13;
+            s.t = s.x;
+            s.op = "sys";
+        }
+    };
+
+    template<>
+    struct action<in_int>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // INT @io, rX -0+ 00+ RRR PPP PPP PPP
+            s.o = -8;
+            s.m = 1;
+            s.op = "int";
+        }
+    };
+
+    template<>
+    struct action<in_inb>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // INB @io, rX -0+ 0++ RRR PPP PPP PPP
+            s.o = -8;
+            s.m = 4;
+            s.op = "inb";
+        }
+    };
+
+    template<>
+    struct action<in_out>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // OUT rX, @io -0+ 00- RRR PPP PPP PPP
+            s.o = -8;
+            s.m = -1;
+            s.op = "out";
+        }
+    };
+
+    template<>
+    struct action<in_oub>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // OUB rX, @io -0+ 0+- RRR PPP PPP PPP
+            s.o = 8;
+            s.m = 2;
+            s.op = "oub";
+        }
+    };
+
+    template<>
+    struct action<in_cmi>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CMI, rX, imm 00+ -0+ ... XXX iii iii
+            s.o = 1;
+            s.m = -8;
+            s.t = 0;
+            s.op = "cmi";
+        }
+    };
+
+    template<>
+    struct action<in_shl>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // SHL, rX, imm 00+ --+ ... XXX iii iii
+            s.o = 1;
+            s.m = -11;
+            s.t = 0;
+            s.op = "shl";
+        }
+    };
+
+    template<>
+    struct action<in_shr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // SHR, rX, imm 00+ --- ... XXX iii iii
+            s.o = 1;
+            s.m = -13;
+            s.t = 0;
+            s.op = "shr";
+        }
+    };
+
+    template<>
+    struct action<in_rol>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // ROL, rX, imm 00+ -++ ... XXX iii iii
+            s.o = 1;
+            s.m = -5;
+            s.t = 0;
+            s.op = "rol";
+        }
+    };
+
+    template<>
+    struct action<in_ror>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // ROR, rX, imm 00+ -+- ... XXX iii iii
+            s.o = 1;
+            s.m = -7;
+            s.t = 0;
+            s.op = "ror";
+        }
+    };
+
+    template<>
+    struct action<in_rcl>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // RCL, rX, imm 00+ --0 ... XXX iii iii
+            s.o = 1;
+            s.m = -12;
+            s.t = 0;
+            s.op = "rcl";
+        }
+    };
+
+    template<>
+    struct action<in_rcr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CMI, rX, imm 00+ -0- ... XXX iii iii
+            s.o = 1;
+            s.m = -10;
+            s.t = 0;
+            s.op = "rcr";
+        }
+    };
+
+    template<>
+    struct action<in_bri>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BRI, rX, imm +0+ 0+- ... XXX iii iii
+            s.o = 10;
+            s.m = 2;
+            s.t = 0;
+            s.op = "bri";
+        }
+    };
+
+    template<>
     struct action<logical_single_t>
     {
         template<typename Input, typename State>
@@ -873,6 +1178,102 @@ namespace ternary { namespace assembler {
             s.operands.pop();
         }
     };
+
+    template<>
+    struct action<logical_double>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Put 2 operands in Y and Z fields of opcode
+            s.y = s.operands.front();
+            s.operands.pop();
+            s.z = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<logical_immediate>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register operand in X, then 6-trit immediate in Y:Z
+            s.x = s.operands.front();
+            s.operands.pop();
+
+            auto imm { s.operands.front() };
+            s.operands.pop();
+
+            s.y = shift_right(imm, 3);
+            s.z = low_trits(imm, 3);
+        }
+    };
+
+    template<>
+    struct action<branch_vector>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // One operand fills the Y and Z fields
+            auto vec { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(vec, 3);
+            s.y = shift_right(vec, 3);
+        }
+    };
+
+    template<>
+    struct action<input>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register operand in T field, then I/O address in X,Y,Z
+            auto ioaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.x = shift_right(ioaddr, 6);
+            s.y = low_trits(shift_right(ioaddr, 3), 3);
+            s.z = low_trits(ioaddr, 3);
+
+            s.t = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<output>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register operand in T field, then I/O address in X,Y,Z
+            // Output has a different operand order, so account for that.
+            s.t = s.operands.front();
+            s.operands.pop();
+
+            auto ioaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.x = shift_right(ioaddr, 6);
+            s.y = low_trits(shift_right(ioaddr, 3), 3);
+            s.z = low_trits(ioaddr, 3);
+        }
+    };
+
+    // These do the same thing for now, but we may need to change later
+    template<>
+    struct action<move_basic> : action<logical_double> {};
+
+    template<>
+    struct action<branch_indirect> : action<logical_single_z> {};
+
+    template<>
+    struct action<branch_immediate> : action<logical_immediate> {};
 
     // TODO: Testing
     template<>

@@ -274,6 +274,95 @@ namespace ternary { namespace assembler {
         TAO_PEGTL_KEYWORD("not")
     {};
 
+    struct in_cmp :
+        TAO_PEGTL_KEYWORD("cmp")
+    {};
+    
+    struct in_mov :
+        TAO_PEGTL_KEYWORD("mov")
+    {};
+    
+    struct in_xch :
+        TAO_PEGTL_KEYWORD("xch")
+    {};
+    
+    struct in_bin :
+        TAO_PEGTL_KEYWORD("bin")
+    {};
+    
+    struct in_tri :
+        TAO_PEGTL_KEYWORD("tri")
+    {};
+    
+    struct in_fdr :
+        TAO_PEGTL_KEYWORD("fdr")
+    {};
+    
+    struct in_rdr :
+        TAO_PEGTL_KEYWORD("rdr")
+    {};
+    
+    struct in_brr :
+        TAO_PEGTL_KEYWORD("brr")
+    {};
+    
+    struct in_caa :
+        TAO_PEGTL_KEYWORD("caa")
+    {};
+    
+    struct in_sys :
+        TAO_PEGTL_KEYWORD("sys")
+    {};
+    
+    struct in_int :
+        TAO_PEGTL_KEYWORD("int")
+    {};
+    
+    struct in_inb :
+        TAO_PEGTL_KEYWORD("inb")
+    {};
+    
+    struct in_out :
+        TAO_PEGTL_KEYWORD("out")
+    {};
+    
+    struct in_oub :
+        TAO_PEGTL_KEYWORD("oub")
+    {};
+    
+    struct in_cmi :
+        TAO_PEGTL_KEYWORD("cmi")
+    {};
+    
+    struct in_shl :
+        TAO_PEGTL_KEYWORD("shl")
+    {};
+    
+    struct in_shr :
+        TAO_PEGTL_KEYWORD("shr")
+    {};
+    
+    struct in_rol :
+        TAO_PEGTL_KEYWORD("rol")
+    {};
+    
+    struct in_ror :
+        TAO_PEGTL_KEYWORD("ror")
+    {};
+    
+    struct in_rcl :
+        TAO_PEGTL_KEYWORD("rcl")
+    {};
+    
+    struct in_rcr :
+        TAO_PEGTL_KEYWORD("rcr")
+    {};
+    
+    struct in_bri :
+        TAO_PEGTL_KEYWORD("bri")
+    {};
+    
+
     struct flag_positive :
         sor<
             in_pfc,
@@ -415,10 +504,124 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct logical_double :
+        seq<
+            sor<
+                in_cmp,
+                in_bin,
+                in_tri,
+                in_fdr,
+                in_rdr
+            >,
+            star< blank >,
+            register_pair
+        >
+    {};
+
+    struct logical_immediate :
+        seq<
+            sor<
+                in_cmi,
+                in_shl,
+                in_shr,
+                in_rol,
+                in_ror,
+                in_rcl,
+                in_rcr
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ','>,
+            star< blank >,
+            immediate_6
+        >
+    {};
+
+    struct move_basic :
+        seq<
+            sor<
+                in_mov,
+                in_xch
+            >,
+            star< blank >,
+            register_pair
+        >
+    {};
+
+    struct branch_indirect :
+        seq<
+            sor<
+                in_brr,
+                in_caa
+            >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct branch_immediate :
+        seq<
+            in_bri,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ','>,
+            star< blank >,
+            immediate_6
+        >
+    {};
+    
+    struct branch_vector :
+        seq<
+            in_sys,
+            star< blank >,
+            system_call_vector
+        >
+    {};
+
+    struct input :
+        seq<
+            sor<
+                in_int,
+                in_inb
+            >,
+            star< blank >,
+            io_address,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct output :
+        seq<
+            sor<
+                in_out,
+                in_oub
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            io_address
+        >
+    {};
+
     struct instruction :
         sor<
             no_operand,
-            logical_single
+            logical_single,
+            logical_double,
+            logical_immediate,
+            move_basic,
+            branch_indirect,
+            branch_immediate,
+            branch_vector,
+            input,
+            output
         >
     {};
 }}

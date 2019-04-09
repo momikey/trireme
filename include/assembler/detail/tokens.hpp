@@ -68,6 +68,41 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    // A pair of registers
+    struct register_pair :
+        seq<
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    // A system-call vector
+    struct system_call_vector :
+        seq<
+            one< '#' >,
+            number
+        >
+    {};
+
+    // An I/O address
+    struct io_address :
+        seq<
+            one< '@' >,
+            number
+        >
+    {};
+
+    // Immediate values
+    // We have different rules for different sizes
+    // so we can attach individual actions to them.
+    struct immediate_6 : number {};
+
+    struct immediate_9 : number {};
+
+    struct memory_12 : number {};
 }}
 
 #endif /* TRIREME_ASSEMBLER_TOKENS_HPP */
