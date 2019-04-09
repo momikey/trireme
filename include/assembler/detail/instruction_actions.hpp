@@ -90,6 +90,29 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
+        template<Flags f, typename Input, typename State>
+        inline void branch_flag_positive(const Input& in, State& s)
+        {
+            // BPf +++ fff
+            s.o = 13;
+            s.m = static_cast<int>(f);
+        }
+
+        template<Flags f, typename Input, typename State>
+        inline void branch_flag_zero(const Input& in, State& s)
+        {
+            // BZf ++0 fff
+            s.o = 12;
+            s.m = static_cast<int>(f);
+        }
+
+        template<Flags f, typename Input, typename State>
+        inline void branch_flag_negative(const Input& in, State& s)
+        {
+            // BNf ++- fff
+            s.o = 11;
+            s.m = static_cast<int>(f);
+        }
     }
 
     // Actions for assembler instructions
@@ -1144,6 +1167,323 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_bra>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BRA mem +0+ +00
+            s.o = 10;
+            s.m = 9;
+            s.op = "bra";
+        }
+    };
+
+    template<>
+    struct action<in_brs>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BRS mem +0+ 00- ... ...
+            s.o = 10;
+            s.m = -1;
+            s.t = s.x = 0;
+            s.op = "brs";
+        }
+    };
+
+    template<>
+    struct action<in_brl>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // BRL mem +0+ 00+
+            s.o = 10;
+            s.m = 1;
+            s.op = "brl";
+        }
+    };
+
+    template<>
+    struct action<in_cal>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CAL mem +0+ 000
+            s.o = 10;
+            s.m = 0;
+            s.op = "cal";
+        }
+    };
+
+    template<>
+    struct action<in_bpc>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpc";
+            return detail::branch_flag_positive<Flags::carry>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bps>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bps";
+            return detail::branch_flag_positive<Flags::sign>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpd>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpd";
+            return detail::branch_flag_positive<Flags::direction>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpa>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpa";
+            return detail::branch_flag_positive<Flags::absolute>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpb>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpb";
+            return detail::branch_flag_positive<Flags::binary>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpt>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpt";
+            return detail::branch_flag_positive<Flags::trap>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpi>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpi";
+            return detail::branch_flag_positive<Flags::interrupt>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bpp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bpp";
+            return detail::branch_flag_positive<Flags::protect>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzc>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzc";
+            return detail::branch_flag_zero<Flags::carry>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzs>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzs";
+            return detail::branch_flag_zero<Flags::sign>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzd>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzd";
+            return detail::branch_flag_zero<Flags::direction>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bza>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bza";
+            return detail::branch_flag_zero<Flags::absolute>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzb>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzb";
+            return detail::branch_flag_zero<Flags::binary>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzt>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzt";
+            return detail::branch_flag_zero<Flags::trap>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzi>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzi";
+            return detail::branch_flag_zero<Flags::interrupt>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bzp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bzp";
+            return detail::branch_flag_zero<Flags::protect>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bnc>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bnc";
+            return detail::branch_flag_negative<Flags::carry>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bns>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bns";
+            return detail::branch_flag_negative<Flags::sign>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bnd>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bnd";
+            return detail::branch_flag_negative<Flags::direction>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bna>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bna";
+            return detail::branch_flag_negative<Flags::absolute>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bnb>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bnb";
+            return detail::branch_flag_negative<Flags::binary>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bnt>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bnt";
+            return detail::branch_flag_negative<Flags::trap>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bni>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bni";
+            return detail::branch_flag_negative<Flags::interrupt>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_bnp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "bnp";
+            return detail::branch_flag_negative<Flags::protect>(in, s);
+        }
+    };
+
+    template<>
     struct action<logical_single_t>
     {
         template<typename Input, typename State>
@@ -1268,6 +1608,27 @@ namespace ternary { namespace assembler {
     // These do the same thing for now, but we may need to change later
     template<>
     struct action<move_basic> : action<logical_double> {};
+
+    template<>
+    struct action<branch_basic>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // 12-trit memory address
+            // (BRS instruction only uses 6, but that's okay.)
+            auto memaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.y = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.x = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.t = memaddr;
+        }
+    };
 
     template<>
     struct action<branch_indirect> : action<logical_single_z> {};

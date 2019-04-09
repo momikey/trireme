@@ -53,6 +53,16 @@ namespace ternary { namespace assembler {
             s.operands.push(low_trits(s.converted, 9));
         }
     };
+
+    template<>
+    struct action<memory_12>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.push(low_trits(s.converted, 12));
+        }
+    };
     
     template<>
     struct action<cpu_register>

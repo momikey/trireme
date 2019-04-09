@@ -362,6 +362,118 @@ namespace ternary { namespace assembler {
         TAO_PEGTL_KEYWORD("bri")
     {};
     
+    struct in_bra :
+        TAO_PEGTL_KEYWORD("bra")
+    {};
+    
+    struct in_brs :
+        TAO_PEGTL_KEYWORD("brs")
+    {};
+    
+    struct in_brl :
+        TAO_PEGTL_KEYWORD("brl")
+    {};
+    
+    struct in_cal :
+        TAO_PEGTL_KEYWORD("cal")
+    {};
+    
+    struct in_bpc :
+        TAO_PEGTL_KEYWORD("bpc")
+    {};
+    
+    struct in_bps :
+        TAO_PEGTL_KEYWORD("bps")
+    {};
+    
+    struct in_bpd :
+        TAO_PEGTL_KEYWORD("bpd")
+    {};
+    
+    struct in_bpa :
+        TAO_PEGTL_KEYWORD("bpa")
+    {};
+    
+    struct in_bpb :
+        TAO_PEGTL_KEYWORD("bpb")
+    {};
+    
+    struct in_bpt :
+        TAO_PEGTL_KEYWORD("bpt")
+    {};
+    
+    struct in_bpi :
+        TAO_PEGTL_KEYWORD("bpi")
+    {};
+    
+    struct in_bpp :
+        TAO_PEGTL_KEYWORD("bpp")
+    {};
+    
+    struct in_bzc :
+        TAO_PEGTL_KEYWORD("bzc")
+    {};
+    
+    struct in_bzs :
+        TAO_PEGTL_KEYWORD("bzs")
+    {};
+    
+    struct in_bzd :
+        TAO_PEGTL_KEYWORD("bzd")
+    {};
+    
+    struct in_bza :
+        TAO_PEGTL_KEYWORD("bza")
+    {};
+    
+    struct in_bzb :
+        TAO_PEGTL_KEYWORD("bzb")
+    {};
+    
+    struct in_bzt :
+        TAO_PEGTL_KEYWORD("bzt")
+    {};
+    
+    struct in_bzi :
+        TAO_PEGTL_KEYWORD("bzi")
+    {};
+    
+    struct in_bzp :
+        TAO_PEGTL_KEYWORD("bzp")
+    {};
+    
+    struct in_bnc :
+        TAO_PEGTL_KEYWORD("bnc")
+    {};
+    
+    struct in_bns :
+        TAO_PEGTL_KEYWORD("bns")
+    {};
+    
+    struct in_bnd :
+        TAO_PEGTL_KEYWORD("bnd")
+    {};
+    
+    struct in_bna :
+        TAO_PEGTL_KEYWORD("bna")
+    {};
+    
+    struct in_bnb :
+        TAO_PEGTL_KEYWORD("bnb")
+    {};
+    
+    struct in_bnt :
+        TAO_PEGTL_KEYWORD("bnt")
+    {};
+    
+    struct in_bni :
+        TAO_PEGTL_KEYWORD("bni")
+    {};
+    
+    struct in_bnp :
+        TAO_PEGTL_KEYWORD("bnp")
+    {};
+    
 
     struct flag_positive :
         sor<
@@ -549,6 +661,43 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct branch_basic :
+        seq<
+            sor<
+                in_bra,
+                in_brs,
+                in_brl,
+                in_cal,
+                in_bpc,
+                in_bps,
+                in_bpd,
+                in_bpa,
+                in_bpb,
+                in_bpt,
+                in_bpi,
+                in_bpp,
+                in_bzc,
+                in_bzs,
+                in_bzd,
+                in_bza,
+                in_bzb,
+                in_bzt,
+                in_bzi,
+                in_bzp,
+                in_bnc,
+                in_bns,
+                in_bnd,
+                in_bna,
+                in_bnb,
+                in_bnt,
+                in_bni,
+                in_bnp
+            >,
+            star< blank >,
+            memory_12
+        >
+    {};
+
     struct branch_indirect :
         seq<
             sor<
@@ -617,6 +766,7 @@ namespace ternary { namespace assembler {
             logical_double,
             logical_immediate,
             move_basic,
+            branch_basic,
             branch_indirect,
             branch_immediate,
             branch_vector,
