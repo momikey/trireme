@@ -54,6 +54,10 @@ namespace ternary { namespace assembler {
         }
     };
 
+    // This is the same for now
+    template<>
+    struct action<memory_6> : action<immediate_6> {};
+
     template<>
     struct action<memory_12>
     {
@@ -101,6 +105,26 @@ namespace ternary { namespace assembler {
             // s.converted = string_to_value(ioaddr);
 
             s.operands.push(low_trits(s.converted, io_width));
+        }
+    };
+    
+    template<>
+    struct action<system_register>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            std::string regtype { in.begin(), in.begin()+1 };
+            std::string regnum { in.begin()+2, in.end() };
+            
+            s.converted = std::stoi(regnum);
+
+            if (regtype[0] == 'd' || regtype[0] == 'D')
+            {
+                s.converted = -s.converted;
+            }
+
+            s.operands.push(s.converted);
         }
     };
 

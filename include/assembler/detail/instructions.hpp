@@ -474,6 +474,87 @@ namespace ternary { namespace assembler {
         TAO_PEGTL_KEYWORD("bnp")
     {};
     
+    struct in_ldr :
+        TAO_PEGTL_KEYWORD("ldr")
+    {};
+    
+    struct in_ldl :
+        TAO_PEGTL_KEYWORD("ldl")
+    {};
+    
+    struct in_ldm :
+        TAO_PEGTL_KEYWORD("ldm")
+    {};
+    
+    struct in_ldh :
+        TAO_PEGTL_KEYWORD("ldh")
+    {};
+    
+    struct in_ldn :
+        TAO_PEGTL_KEYWORD("ldn")
+    {};
+    
+    struct in_str :
+        TAO_PEGTL_KEYWORD("str")
+    {};
+    
+    struct in_stl :
+        TAO_PEGTL_KEYWORD("stl")
+    {};
+    
+    struct in_stm :
+        TAO_PEGTL_KEYWORD("stm")
+    {};
+    
+    struct in_sth :
+        TAO_PEGTL_KEYWORD("sth")
+    {};
+    
+    struct in_stn :
+        TAO_PEGTL_KEYWORD("stn")
+    {};
+    
+    struct in_lda :
+        TAO_PEGTL_KEYWORD("lda")
+    {};
+    
+    struct in_lal :
+        TAO_PEGTL_KEYWORD("lal")
+    {};
+    
+    struct in_lam :
+        TAO_PEGTL_KEYWORD("lam")
+    {};
+    
+    struct in_lah :
+        TAO_PEGTL_KEYWORD("lah")
+    {};
+    
+    struct in_sta :
+        TAO_PEGTL_KEYWORD("sta")
+    {};
+    
+    struct in_sal :
+        TAO_PEGTL_KEYWORD("sal")
+    {};
+    
+    struct in_sam :
+        TAO_PEGTL_KEYWORD("sam")
+    {};
+    
+    struct in_sah :
+        TAO_PEGTL_KEYWORD("sah")
+    {};
+    
+    struct in_lsr :
+        TAO_PEGTL_KEYWORD("lsr")
+    {};
+    
+    struct in_ssr :
+        TAO_PEGTL_KEYWORD("ssr")
+    {};
+    
+    
 
     struct flag_positive :
         sor<
@@ -715,7 +796,7 @@ namespace ternary { namespace assembler {
             star< blank >,
             cpu_register,
             star< blank >,
-            one< ','>,
+            one< ',' >,
             star< blank >,
             immediate_6
         >
@@ -726,6 +807,85 @@ namespace ternary { namespace assembler {
             in_sys,
             star< blank >,
             system_call_vector
+        >
+    {};
+
+    struct load_basic :
+        seq<
+            sor<
+                in_ldr,
+                in_ldl,
+                in_ldm,
+                in_ldh
+            >,
+            star< blank >,
+            memory_12,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct load_indexed :
+        seq<
+            in_ldn,
+            star< blank >,
+            memory_6,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct store_basic :
+        seq<
+            sor<
+                in_str,
+                in_stl,
+                in_stm,
+                in_sth
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            memory_12
+        >
+    {};
+
+    struct store_indexed :
+        seq<
+            in_stn,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            memory_6
+        >
+    {};
+
+    struct load_store_indirect :
+        seq<
+            sor<
+                in_lda,
+                in_lal,
+                in_lam,
+                in_lah,
+                in_sta,
+                in_sal,
+                in_sam,
+                in_sah
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
         >
     {};
 
@@ -759,6 +919,30 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct load_system :
+        seq<
+            in_lsr,
+            star< blank >,
+            system_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
+    struct store_system :
+        seq<
+            in_ssr,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            system_register
+        >
+    {};
+
     struct instruction :
         sor<
             no_operand,
@@ -770,6 +954,13 @@ namespace ternary { namespace assembler {
             branch_indirect,
             branch_immediate,
             branch_vector,
+            load_basic,
+            load_indexed,
+            store_basic,
+            store_indexed,
+            load_store_indirect,
+            load_system,
+            store_system,
             input,
             output
         >

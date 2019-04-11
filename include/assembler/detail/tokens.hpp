@@ -95,12 +95,27 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    // A system register (control or debug)
+    // As of right now, there are only 4 of each,
+    // so 1 digit will suffice.
+    struct system_register :
+        seq<
+            sor<
+                TAO_PEGTL_ISTRING("cr"),
+                TAO_PEGTL_ISTRING("dr")
+            >,
+            digit
+        >
+    {};
+
     // Immediate values
     // We have different rules for different sizes
     // so we can attach individual actions to them.
     struct immediate_6 : number {};
 
     struct immediate_9 : number {};
+
+    struct memory_6 : number {};
 
     struct memory_12 : number {};
 }}

@@ -1484,6 +1484,250 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_ldr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 9;
+            s.op = "ldr";
+        }
+    };
+
+    template<>
+    struct action<in_ldl>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 5;
+            s.op = "ldl";
+        }
+    };
+
+    template<>
+    struct action<in_ldm>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 6;
+            s.op = "ldm";
+        }
+    };
+
+    template<>
+    struct action<in_ldh>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 7;
+            s.op = "ldh";
+        }
+    };
+
+    template<>
+    struct action<in_ldn>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 10;
+            s.t = 0;
+            s.op = "ldn";
+        }
+    };
+
+    template<>
+    struct action<in_str>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -9;
+            s.op = "str";
+        }
+    };
+
+    template<>
+    struct action<in_stl>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -13;
+            s.op = "stl";
+        }
+    };
+
+    template<>
+    struct action<in_stm>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -12;
+            s.op = "stm";
+        }
+    };
+
+    template<>
+    struct action<in_sth>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -11;
+            s.op = "sth";
+        }
+    };
+
+    template<>
+    struct action<in_stn>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = -8;
+            s.t = 0;
+            s.op = "stn";
+        }
+    };
+
+    template<>
+    struct action<in_lda>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 9;
+            s.t = s.x = 0;
+            s.op = "lda";
+        }
+    };
+
+    template<>
+    struct action<in_lal>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 5;
+            s.t = s.x = 0;
+            s.op = "lal";
+        }
+    };
+
+    template<>
+    struct action<in_lam>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 6;
+            s.t = s.x = 0;
+            s.op = "lam";
+        }
+    };
+
+    template<>
+    struct action<in_lah>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 7;
+            s.t = s.x = 0;
+            s.op = "lah";
+        }
+    };
+
+    template<>
+    struct action<in_sta>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -10;
+            s.m = 9;
+            s.t = s.x = 0;
+            s.op = "sta";
+        }
+    };
+
+    template<>
+    struct action<in_sal>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -10;
+            s.m = 5;
+            s.t = s.x = 0;
+            s.op = "sal";
+        }
+    };
+
+    template<>
+    struct action<in_sam>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -10;
+            s.m = 6;
+            s.t = s.x = 0;
+            s.op = "sam";
+        }
+    };
+
+    template<>
+    struct action<in_sah>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = -10;
+            s.m = 7;
+            s.t = s.x = 0;
+            s.op = "sah";
+        }
+    };
+
+    template<>
+    struct action<in_lsr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 0;
+            s.m = 1;
+            s.t = s.y = 0;
+            s.op = "lsr";
+        }
+    };
+
+    template<>
+    struct action<in_ssr>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 0;
+            s.m = -1;
+            s.t = s.y = 0;
+            s.op = "ssr";
+        }
+    };
+
+    template<>
     struct action<logical_single_t>
     {
         template<typename Input, typename State>
@@ -1552,6 +1796,103 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<load_basic>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Memory operand in T,X,Y,Z fields, register in M
+            auto memaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.y = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.x = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.t = memaddr;
+
+            s.m = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<load_indexed>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Memory operand in Y:Z, register in X
+            auto memaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(memaddr, 3);
+            s.y = shift_right(memaddr, 3);
+
+            s.x = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<store_basic>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register operand in M, memory address in T,X,Y,Z
+            s.m = s.operands.front();
+            s.operands.pop();
+
+            auto memaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.y = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.x = low_trits(memaddr, 3);
+            memaddr = shift_right(memaddr, 3);
+            s.t = memaddr;
+        }
+    };
+
+    template<>
+    struct action<store_indexed>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register in X, memory operand in Y:Z
+            s.x = s.operands.front();
+            s.operands.pop();            
+
+            auto memaddr { s.operands.front() };
+            s.operands.pop();
+
+            s.z = low_trits(memaddr, 3);
+            s.y = shift_right(memaddr, 3);
+        }
+    };
+
+    template<>
+    struct action<load_store_indirect>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Registers in Y and Z
+            s.y = s.operands.front();
+            s.operands.pop();
+
+            s.z = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
     struct action<branch_vector>
     {
         template<typename Input, typename State>
@@ -1605,10 +1946,6 @@ namespace ternary { namespace assembler {
         }
     };
 
-    // These do the same thing for now, but we may need to change later
-    template<>
-    struct action<move_basic> : action<logical_double> {};
-
     template<>
     struct action<branch_basic>
     {
@@ -1629,6 +1966,41 @@ namespace ternary { namespace assembler {
             s.t = memaddr;
         }
     };
+
+    template<>
+    struct action<load_system>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Register in X, system register in Z
+            s.x = s.operands.front();
+            s.operands.pop();
+
+            s.z = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    template<>
+    struct action<store_system>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // Operands are reversed from load version,
+            // but still placed in the same fields
+            s.z = s.operands.front();
+            s.operands.pop();
+
+            s.x = s.operands.front();
+            s.operands.pop();
+        }
+    };
+
+    // These do the same thing for now, but we may need to change later
+    template<>
+    struct action<move_basic> : action<logical_double> {};
 
     template<>
     struct action<branch_indirect> : action<logical_single_z> {};
