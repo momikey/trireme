@@ -10,6 +10,103 @@ namespace ternary { namespace assembler {
 
     // Grammar rules for assembler instructions
 
+    struct in_add :
+        TAO_PEGTL_KEYWORD("add")
+    {};
+    
+    struct in_adc :
+        TAO_PEGTL_KEYWORD("adc")
+    {};
+    
+    struct in_sub :
+        TAO_PEGTL_KEYWORD("sub")
+    {};
+    
+    struct in_sbc :
+        TAO_PEGTL_KEYWORD("sbc")
+    {};
+    
+    struct in_mul :
+        TAO_PEGTL_KEYWORD("mul")
+    {};
+    
+    struct in_div :
+        TAO_PEGTL_KEYWORD("div")
+    {};
+    
+    struct in_min :
+        TAO_PEGTL_KEYWORD("min")
+    {};
+    
+    struct in_max :
+        TAO_PEGTL_KEYWORD("max")
+    {};
+    
+    struct in_teq :
+        TAO_PEGTL_KEYWORD("teq")
+    {};
+    
+    struct in_tem :
+        TAO_PEGTL_KEYWORD("tem")
+    {};
+    
+    struct in_and :
+        TAO_PEGTL_KEYWORD("and")
+    {};
+    
+    struct in_ort :
+        TAO_PEGTL_KEYWORD("ort")
+    {};
+    
+    struct in_pad :
+        TAO_PEGTL_KEYWORD("pad")
+    {};
+    
+    struct in_psb :
+        TAO_PEGTL_KEYWORD("psb")
+    {};
+    
+    struct in_pmu :
+        TAO_PEGTL_KEYWORD("pmu")
+    {};
+    
+    struct in_pdv :
+        TAO_PEGTL_KEYWORD("pdv")
+    {};
+
+    struct in_adi :
+        TAO_PEGTL_KEYWORD("adi")
+    {};
+    
+    struct in_sbi :
+        TAO_PEGTL_KEYWORD("sbi")
+    {};
+    
+    struct in_mli :
+        TAO_PEGTL_KEYWORD("mli")
+    {};
+    
+    struct in_dvi :
+        TAO_PEGTL_KEYWORD("dvi")
+    {};
+    
+    struct in_ldi :
+        TAO_PEGTL_KEYWORD("ldi")
+    {};
+    
+    struct in_lil :
+        TAO_PEGTL_KEYWORD("lil")
+    {};
+    
+    struct in_lim :
+        TAO_PEGTL_KEYWORD("lim")
+    {};
+    
+    struct in_lih :
+        TAO_PEGTL_KEYWORD("lih")
+    {};
+    
+
     struct in_ret :
         TAO_PEGTL_KEYWORD("ret")
     {};
@@ -554,7 +651,22 @@ namespace ternary { namespace assembler {
         TAO_PEGTL_KEYWORD("ssr")
     {};
     
-    
+    struct arithmetic_basic_instruction :
+        sor<
+            in_add,
+            in_adc,
+            in_sub,
+            in_sbc,
+            in_mul,
+            in_div,
+            in_min,
+            in_max,
+            in_teq,
+            in_tem,
+            in_and,
+            in_ort
+        >
+    {};
 
     struct flag_positive :
         sor<
@@ -647,6 +759,58 @@ namespace ternary { namespace assembler {
             skip_positive,
             skip_zero,
             skip_negative
+        >
+    {};
+
+    struct arithmetic_basic :
+        seq<
+            arithmetic_basic_instruction,
+            star< blank >,
+            cpu_register,
+            rep_max< 2,
+                star< blank >,
+                one< ',' >,
+                star< blank >,
+                cpu_register
+            >
+        >
+    {};
+
+    struct arithmetic_immediate :
+        seq<
+            sor<
+                in_adi,
+                in_sbi,
+                in_mli,
+                in_dvi
+            >,
+            star< blank >,
+            cpu_register,
+            opt<
+                one< ',' >,
+                star< blank >,
+                cpu_register
+            >,
+            one< ',' >,
+            star< blank >,
+            immediate_6
+        >
+    {};
+
+    struct arithmetic_inplace :
+        seq<
+            sor<
+                in_pad,
+                in_psb,
+                in_pmu,
+                in_pdv
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            immediate_9
         >
     {};
 
@@ -827,6 +991,23 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct load_immediate :
+        seq<
+            sor<
+                in_ldi,
+                in_lil,
+                in_lim,
+                in_lih
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            immediate_6
+        >
+    {};
+
     struct load_indexed :
         seq<
             in_ldn,
@@ -946,6 +1127,9 @@ namespace ternary { namespace assembler {
     struct instruction :
         sor<
             no_operand,
+            arithmetic_basic,
+            arithmetic_immediate,
+            arithmetic_inplace,
             logical_single,
             logical_double,
             logical_immediate,
@@ -955,6 +1139,7 @@ namespace ternary { namespace assembler {
             branch_immediate,
             branch_vector,
             load_basic,
+            load_immediate,
             load_indexed,
             store_basic,
             store_indexed,
