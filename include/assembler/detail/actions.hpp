@@ -128,13 +128,26 @@ namespace ternary { namespace assembler {
         }
     };
 
+    // TODO: Testing
     template<>
-    struct action<label_name>
+    struct action<instruction>
     {
         template<typename Input, typename State>
         static void apply(const Input& in, State& s)
         {
-            std::clog << in.string() << '\n';
+            std::clog
+                << s.instruction_pointer << '\t'
+                << s.op << '\t'
+                << s.o << '\t'
+                << s.m << '\t'
+                << s.t << '\t'
+                << s.x << '\t'
+                << s.y << '\t'
+                << s.z << '\n'
+            ;
+
+            // All Trireme instructions are 1 word, or 3 hexads
+            s.instruction_pointer += 3;
         }
     };
 }}

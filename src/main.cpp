@@ -1,7 +1,6 @@
 #include <iostream>
 #include <array>
 #include <string>
-#include <queue>
 
 #include "convert.hpp"
 #include "ternary_math.hpp"
@@ -11,6 +10,7 @@
 #include "detail/character_to_value.hpp"
 
 #include "assembler/assembler.hpp"
+#include "assembler/detail/state.hpp"
 
 using namespace ternary;
 
@@ -39,15 +39,6 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
     return os << pair.first << ',' << pair.second;
 }
 
-struct test_state
-{
-    int converted;
-    int o,m,t,x,y,z;
-    std::string op;
-    std::queue<int> operands {};
-};
-
-
 int main(int, char**) {
     using namespace std::string_literals;
 
@@ -61,8 +52,7 @@ int main(int, char**) {
 
     if (!analysis)
     {
-        test_state ts {};
+        ternary::assembler::state ts {};
         std::cout << ternary::assembler::assemble(fin, ts) << '\n';
-        std::cout << ts.converted << '\n';
     }
 }

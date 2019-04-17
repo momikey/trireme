@@ -8,11 +8,22 @@
 #include "detail/grammar.hpp"
 #include "detail/actions.hpp"
 #include "detail/instruction_actions.hpp"
+#include "detail/firstpass_actions.hpp"
 
 namespace ternary { namespace assembler {
     std::size_t analyze()
     {
         return tao::pegtl::analyze<grammar>();
+    }
+
+    template<typename Input, typename State>
+    bool first_pass(Input& in, State&& st)
+    {
+        return tao::pegtl::parse<
+            grammar,
+            firstpass
+            >
+            (in, st);
     }
 
     template<typename Input, typename State>
@@ -25,8 +36,6 @@ namespace ternary { namespace assembler {
             >
             (in, st);
     }
-
-    int dummy();
 }}
 
 #endif /* TRIREME_ASSEMBLER_ASSEMBLER_HPP */

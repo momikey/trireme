@@ -33,28 +33,26 @@ namespace ternary { namespace assembler
     {};
 
     struct line :
-        pad<
-            seq<
-                opt<
-                    label
-                >,
-                must<
-                    operand
-                >
-            >,
-            blank
+        seq<
+            star< ignored >,
+            star< label >,
+            instruction,
+            star< ignored >
         >
     {};
 
     struct grammar :
-        plus<
-            if_must<
-                instruction,
+        seq<
+            plus<
                 sor<
-                    eolf,
-                    ignored
+                    line
+                // if_must<
+                //     line,
+                //     eol
+                // >
                 >
-            >
+            >,
+            eof
         >
         // until< eof,
         //     plus<

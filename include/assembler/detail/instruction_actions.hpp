@@ -2391,24 +2391,6 @@ namespace ternary { namespace assembler {
 
     template<>
     struct action<branch_immediate> : action<logical_immediate> {};
-
-    // TODO: Testing
-    template<>
-    struct action<instruction>
-    {
-        template<typename Input, typename State>
-        static void apply(const Input& in, State& s)
-        {
-            std::cout
-                << s.op << '\t'
-                << s.o << '\t'
-                << s.m << '\t'
-                << s.t << '\t'
-                << s.x << '\t'
-                << s.y << '\t'
-                << s.z << '\n';
-        }
-    };
 }}
 
 #endif /* TRIREME_INSTRUCTION_ACTIONS_HPP */

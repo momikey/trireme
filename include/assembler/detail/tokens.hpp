@@ -12,12 +12,16 @@ namespace ternary { namespace assembler {
         seq<
             one< ';' >,
             until< eolf >
+            // star<
+            //     not_at< eolf >,
+            //     any
+            // >
         >
     {};
 
     struct ignored :
         sor<
-            blank,
+            space,
             comment
         >
     {};
