@@ -46,13 +46,21 @@ int main(int, char**) {
     tao::pegtl::string_input<> in { s, "testing" };
 
     std::string sample_filename { "sandbox/sample.txt" };
-    tao::pegtl::file_input<> fin { sample_filename };
 
     auto analysis { ternary::assembler::analyze() };
 
     if (!analysis)
     {
         ternary::assembler::state ts {};
+
+        tao::pegtl::file_input<> fpin { sample_filename };
+        ternary::assembler::first_pass(fpin, ts);
+        for (auto kv : ts.symbol_table)
+        {
+            std::cout << kv.first << " = " << kv.second << '\n';
+        }
+
+        tao::pegtl::file_input<> fin { sample_filename };
         std::cout << ternary::assembler::assemble(fin, ts) << '\n';
     }
 }

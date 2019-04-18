@@ -112,6 +112,9 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    // A reference to a variable/constant
+    struct reference : identifier {};
+
     // Immediate values
     // We have different rules for different sizes
     // so we can attach individual actions to them.
