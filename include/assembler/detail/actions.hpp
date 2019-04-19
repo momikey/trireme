@@ -59,6 +59,9 @@ namespace ternary { namespace assembler {
     struct action<memory_6> : action<immediate_6> {};
 
     template<>
+    struct action<memory_offset_6> : action<memory_6> {};
+
+    template<>
     struct action<memory_12>
     {
         template<typename Input, typename State>
@@ -67,6 +70,9 @@ namespace ternary { namespace assembler {
             s.operands.push(low_trits(s.converted, 12));
         }
     };
+
+    template<>
+    struct action<memory_offset_12> : action<memory_12> {};
     
     template<>
     struct action<cpu_register>
@@ -125,6 +131,34 @@ namespace ternary { namespace assembler {
             }
 
             s.operands.push(s.converted);
+        }
+    };
+
+    template<>
+    struct action<reference>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            std::string tok { in.begin(), in.end() };
+            auto sym { tok.substr(0, tok.find(':')) };
+
+            std::clog << sym << '\t' << s.symbol_table[sym] << '\n';
+            s.converted = s.symbol_table[sym];
+        }
+    };
+
+    template<>
+    struct action<memory_offset>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            std::string tok { in.begin(), in.end() };
+            auto sym { tok.substr(0, tok.find(':')) };
+
+            std::clog << s.instruction_pointer << '\t' << sym << '\t' << s.symbol_table[sym] << '\n';
+            s.converted = s.symbol_table[sym] - s.instruction_pointer;
         }
     };
 

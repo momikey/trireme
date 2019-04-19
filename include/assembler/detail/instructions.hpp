@@ -910,9 +910,25 @@ namespace ternary { namespace assembler {
         seq<
             sor<
                 in_bra,
-                in_brs,
+                in_cal
+            >,
+            star< blank >,
+            memory_12
+        >
+    {};
+
+    struct branch_offset_6 :
+        seq<
+            in_brs,
+            star< blank >,
+            memory_offset_6
+        >
+    {};
+
+    struct branch_offset_12 :
+        seq<
+            sor<
                 in_brl,
-                in_cal,
                 in_bpc,
                 in_bps,
                 in_bpd,
@@ -939,7 +955,14 @@ namespace ternary { namespace assembler {
                 in_bnp
             >,
             star< blank >,
-            memory_12
+            memory_offset_12
+        >
+    {};
+
+    struct branch_offset :
+        sor<
+            branch_offset_6,
+            branch_offset_12
         >
     {};
 
@@ -1012,7 +1035,7 @@ namespace ternary { namespace assembler {
         seq<
             in_ldn,
             star< blank >,
-            memory_6,
+            memory_offset_6,
             star< blank >,
             one< ',' >,
             star< blank >,
@@ -1045,7 +1068,7 @@ namespace ternary { namespace assembler {
             star< blank >,
             one< ',' >,
             star< blank >,
-            memory_6
+            memory_offset_6
         >
     {};
 
@@ -1136,6 +1159,7 @@ namespace ternary { namespace assembler {
             move_basic,
             branch_basic,
             branch_indirect,
+            branch_offset,
             branch_immediate,
             branch_vector,
             load_basic,

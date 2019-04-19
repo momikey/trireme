@@ -115,16 +115,53 @@ namespace ternary { namespace assembler {
     // A reference to a variable/constant
     struct reference : identifier {};
 
+    // A reference to a memory offset
+    struct memory_offset : identifier {};
+
     // Immediate values
     // We have different rules for different sizes
     // so we can attach individual actions to them.
-    struct immediate_6 : number {};
+    struct immediate_6 : 
+        sor<
+            number,
+            reference
+        >
+    {};
 
-    struct immediate_9 : number {};
+    struct immediate_9 : 
+        sor<
+            number,
+            reference
+        >
+    {};
 
-    struct memory_6 : number {};
+    struct memory_6 :
+        sor<
+            number,
+            reference
+        >
+    {};
 
-    struct memory_12 : number {};
+    struct memory_12 :
+        sor<
+            number,
+            reference
+        >
+    {};
+
+    struct memory_offset_6 :
+        sor<
+            number,
+            memory_offset
+        >
+    {};
+
+    struct memory_offset_12 :
+        sor<
+            number,
+            memory_offset
+        >
+    {};
 }}
 
 #endif /* TRIREME_ASSEMBLER_TOKENS_HPP */

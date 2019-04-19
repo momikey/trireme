@@ -2350,6 +2350,12 @@ namespace ternary { namespace assembler {
             s.t = memaddr;
         }
     };
+    
+    // For now, this does the same thing as the above.
+    // The actions for the individual parts of the isntruction
+    // handle all the internal logic.
+    template<>
+    struct action<branch_offset> : action<branch_basic> {};
 
     template<>
     struct action<load_system>

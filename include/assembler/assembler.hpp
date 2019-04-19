@@ -29,6 +29,7 @@ namespace ternary { namespace assembler {
     template<typename Input, typename State>
     bool assemble(Input& in, State&& st)
     {
+        st.instruction_pointer = 0;
         return tao::pegtl::parse<
             grammar,
             action
