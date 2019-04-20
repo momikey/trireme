@@ -206,6 +206,12 @@ namespace ternary { namespace assembler {
         template<typename Input, typename State>
         static void apply(const Input& in, State& s)
         {
+            // Storage is little-endian
+            s.data[s.instruction_pointer] = s.y * pow3(3) + s.z;
+            s.data[s.instruction_pointer+1] = s.t * pow3(3) + s.x;
+            s.data[s.instruction_pointer+2] = s.o * pow3(3) + s.m;
+
+            // Debugging message
             std::clog
                 << s.instruction_pointer << '\t'
                 << s.op << '\t'

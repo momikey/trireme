@@ -7,7 +7,9 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
+#include "../hexad.hpp"
 #include "detail/grammar.hpp"
 #include "detail/actions.hpp"
 #include "detail/instruction_actions.hpp"
@@ -18,8 +20,10 @@ namespace ternary { namespace assembler {
     class Assembler
     {
         public:
-        bool assemble_file(std::string filename);
-        bool assemble_string(std::string s);
+        using data_map = std::map<int, Hexad>;
+
+        data_map assemble_file(std::string filename);
+        data_map assemble_string(std::string s);
 
         private:
         std::size_t analyze() { return tao::pegtl::analyze<grammar>(); }

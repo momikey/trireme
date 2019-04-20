@@ -47,8 +47,21 @@ int main(int, char**) {
 
     std::string sample_filename { "sandbox/sample.txt" };
     ternary::assembler::Assembler as {};
-    std::cout << as.assemble_file(sample_filename) << '\n';
 
+    try
+    {
+        auto result { as.assemble_file(sample_filename) };
+
+        for (auto kv : result)
+        {
+            std::clog << kv.first << '\t' << kv.second.value_string() << '\n';
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
     // auto analysis { ternary::assembler::analyze() };
 
     // if (!analysis)

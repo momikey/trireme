@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 
+#include "../../hexad.hpp"
+
 namespace ternary { namespace assembler {
 
     struct state
@@ -12,11 +14,13 @@ namespace ternary { namespace assembler {
         int converted;
         int o,m,t,x,y,z;
         std::string op;
-        std::queue<int> operands {};
         int instruction_pointer;
-        std::string working_symbol;
+        std::queue<int> operands {};
 
         std::map<std::string, int> symbol_table {};
+        std::string working_symbol;
+
+        std::map<int, Hexad> data {};
     };
 
 }}
