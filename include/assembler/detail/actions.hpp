@@ -158,6 +158,47 @@ namespace ternary { namespace assembler {
         }
     };
 
+    // We need these in both the 1st & 2nd passes because
+    // we use it to generate addresses for symbols and
+    // for the final assembly.
+    template<>
+    struct action<constant_value>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.push(s.converted);
+        }
+    };
+
+    template<>
+    struct action<directive_ad>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            auto addr { s.operands.front() };
+            s.operands.pop();
+
+            s.instruction_pointer = addr;
+        }
+    };
+
+    // This one is essentially ignored in the 2nd pass,
+    // but we still need to account for the operands.
+    // One is a symbol, which we can ignore, but the 2nd
+    // is a constant value, which gets pushed above, so
+    // we pop it here and discard it.
+    template<>
+    struct action<directive_eq>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.pop();
+        }
+    };
+
     // TODO: Testing
     template<>
     struct action<instruction>

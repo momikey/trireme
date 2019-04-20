@@ -20,9 +20,18 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct directive_ad :
+        seq<
+            TAO_PEGTL_KEYWORD("ad"),
+            star< blank >,
+            constant_value
+        >
+    {};
+
     struct directive :
         sor<
-            directive_eq
+            directive_eq,
+            directive_ad
         >
     {};
 }}

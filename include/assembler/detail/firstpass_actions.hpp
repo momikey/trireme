@@ -64,6 +64,19 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct firstpass<directive_ad>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            auto addr { s.operands.front() };
+            s.operands.pop();
+
+            s.instruction_pointer = addr;
+        }
+    };
+
+    template<>
     struct firstpass<constant_value>
     {
         template<typename Input, typename State>
