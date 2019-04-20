@@ -6,6 +6,7 @@
 
 #include "tokens.hpp"
 #include "instructions.hpp"
+#include "directives.hpp"
 
 namespace ternary { namespace assembler
 {
@@ -36,7 +37,10 @@ namespace ternary { namespace assembler
         seq<
             star< ignored >,
             star< label >,
-            instruction,
+            sor<
+                directive,
+                instruction
+            >,
             star< ignored >
         >
     {};

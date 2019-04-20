@@ -22,6 +22,7 @@ namespace ternary { namespace assembler {
         return tao::pegtl::parse<
             grammar,
             firstpass
+            // ,tracer
             >
             (in, st);
     }
@@ -30,6 +31,8 @@ namespace ternary { namespace assembler {
     bool assemble(Input& in, State&& st)
     {
         st.instruction_pointer = 0;
+        st.operands = decltype(st.operands) {};
+
         return tao::pegtl::parse<
             grammar,
             action

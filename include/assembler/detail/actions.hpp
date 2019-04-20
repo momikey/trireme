@@ -140,9 +140,7 @@ namespace ternary { namespace assembler {
         template<typename Input, typename State>
         static void apply(const Input& in, State& s)
         {
-            std::string tok { in.begin(), in.end() };
-            auto sym { tok.substr(0, tok.find(':')) };
-
+            std::string sym { in.begin(), in.end() };
             std::clog << sym << '\t' << s.symbol_table[sym] << '\n';
             s.converted = s.symbol_table[sym];
         }
@@ -154,9 +152,7 @@ namespace ternary { namespace assembler {
         template<typename Input, typename State>
         static void apply(const Input& in, State& s)
         {
-            std::string tok { in.begin(), in.end() };
-            auto sym { tok.substr(0, tok.find(':')) };
-
+            std::string sym { in.begin(), in.end() };
             std::clog << s.instruction_pointer << '\t' << sym << '\t' << s.symbol_table[sym] << '\n';
             s.converted = s.symbol_table[sym] - s.instruction_pointer;
         }
@@ -180,8 +176,25 @@ namespace ternary { namespace assembler {
                 << s.z << '\n'
             ;
 
-            // All Trireme instructions are 1 word, or 3 hexads
+            // All Trireme instructions are 1 word, or 3 hexads,
+            // and these *must* be word-aligned.
             s.instruction_pointer += 3;
+        }
+    };
+
+    template<>
+    struct action<line>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            if (s.instruction_pointer % 3)
+            {
+                // Instructions must be word-aligned.
+                // We fix that here, although it may mess up
+                // insert directives.
+                s.instruction_pointer += 3 - (s.instruction_pointer % 3);
+            }
         }
     };
 }}

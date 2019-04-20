@@ -118,6 +118,12 @@ namespace ternary { namespace assembler {
     // A reference to a memory offset
     struct memory_offset : identifier {};
 
+    // The declaration of a named constant from an "eq" directive
+    struct constant_declaration : identifier {};
+
+    // The value given to a constant in an "eq" directive
+    struct constant_value :  number {};
+
     // Immediate values
     // We have different rules for different sizes
     // so we can attach individual actions to them.

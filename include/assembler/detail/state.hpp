@@ -14,6 +14,7 @@ namespace ternary { namespace assembler {
         std::string op;
         std::queue<int> operands {};
         int instruction_pointer;
+        std::string working_symbol;
 
         std::map<std::string, int> symbol_table {};
     };
