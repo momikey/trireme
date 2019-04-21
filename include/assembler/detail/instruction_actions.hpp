@@ -113,6 +113,15 @@ namespace ternary { namespace assembler {
             s.o = 11;
             s.m = static_cast<int>(f);
         }
+
+        template<Flags f, typename Input, typename State>
+        inline void ternary_branch(const Input& in, State& s)
+        {
+            // TBf +0- 0-+ fff
+            s.o = 10;
+            s.m = -2;
+            s.t = static_cast<int>(f);
+        }
     }
 
     // Actions for assembler instructions
@@ -1717,6 +1726,94 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_tbc>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbc";
+            return detail::ternary_branch<Flags::carry>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbs>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbs";
+            return detail::ternary_branch<Flags::sign>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbd>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbd";
+            return detail::ternary_branch<Flags::direction>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tba>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tba";
+            return detail::ternary_branch<Flags::absolute>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbb>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbb";
+            return detail::ternary_branch<Flags::binary>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbt>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbt";
+            return detail::ternary_branch<Flags::trap>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbi>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbi";
+            return detail::ternary_branch<Flags::interrupt>(in, s);
+        }
+    };
+
+    template<>
+    struct action<in_tbp>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.op = "tbp";
+            return detail::ternary_branch<Flags::protect>(in, s);
+        }
+    };
+
+    template<>
     struct action<in_ldr>
     {
         template<typename Input, typename State>
@@ -2288,6 +2385,23 @@ namespace ternary { namespace assembler {
 
             s.z = low_trits(vec, 3);
             s.y = shift_right(vec, 3);
+        }
+    };
+
+    template<>
+    struct action<branch_ternary>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.x = s.operands.front();
+            s.operands.pop();
+
+            s.y = s.operands.front();
+            s.operands.pop();
+
+            s.z = s.operands.front();
+            s.operands.pop();
         }
     };
 

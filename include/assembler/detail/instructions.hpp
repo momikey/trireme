@@ -570,6 +570,38 @@ namespace ternary { namespace assembler {
     struct in_bnp :
         TAO_PEGTL_KEYWORD("bnp")
     {};
+
+    struct in_tbc :
+        TAO_PEGTL_KEYWORD("tbc")
+    {};
+    
+    struct in_tbs :
+        TAO_PEGTL_KEYWORD("tbs")
+    {};
+    
+    struct in_tbd :
+        TAO_PEGTL_KEYWORD("tbd")
+    {};
+    
+    struct in_tba :
+        TAO_PEGTL_KEYWORD("tba")
+    {};
+    
+    struct in_tbb :
+        TAO_PEGTL_KEYWORD("tbb")
+    {};
+    
+    struct in_tbt :
+        TAO_PEGTL_KEYWORD("tbt")
+    {};
+    
+    struct in_tbi :
+        TAO_PEGTL_KEYWORD("tbi")
+    {};
+    
+    struct in_tbp :
+        TAO_PEGTL_KEYWORD("tbp")
+    {};
     
     struct in_ldr :
         TAO_PEGTL_KEYWORD("ldr")
@@ -997,6 +1029,31 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct branch_ternary :
+        seq<
+            sor<
+                in_tbc,
+                in_tbs,
+                in_tbd,
+                in_tba,
+                in_tbb,
+                in_tbt,
+                in_tbi,
+                in_tbp
+            >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register,
+            star< blank >,
+            one< ',' >,
+            star< blank >,
+            cpu_register
+        >
+    {};
+
     struct load_basic :
         seq<
             sor<
@@ -1162,6 +1219,7 @@ namespace ternary { namespace assembler {
             branch_offset,
             branch_immediate,
             branch_vector,
+            branch_ternary,
             load_basic,
             load_immediate,
             load_indexed,
