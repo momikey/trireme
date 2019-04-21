@@ -124,6 +124,14 @@ namespace ternary { namespace assembler {
     // The value given to a constant in an "eq" directive
     struct constant_value :  number {};
 
+    // A count for the "zh" and "zw" directives
+    struct reserve_count : 
+        sor<
+            number,
+            reference
+        >
+    {};
+
     // Immediate values
     // We have different rules for different sizes
     // so we can attach individual actions to them.

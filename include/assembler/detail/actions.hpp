@@ -7,6 +7,7 @@
 #include <string>
 
 #include "grammar.hpp"
+#include "word.hpp"
 #include "../../convert.hpp"
 #include "../../ternary_math.hpp"
 
@@ -172,6 +173,16 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<reserve_count>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.operands.push(s.converted);
+        }
+    };
+
+    template<>
     struct action<directive_ad>
     {
         template<typename Input, typename State>
@@ -181,6 +192,88 @@ namespace ternary { namespace assembler {
             s.operands.pop();
 
             s.instruction_pointer = addr;
+        }
+    };
+
+    template<>
+    struct action<directive_dh>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // DH allows arbitrarily many hexads to be defined at once
+            while (!s.operands.empty())
+            {
+                s.data[s.instruction_pointer++] = s.operands.front();
+                s.operands.pop();
+            }
+        }
+    };
+
+    template<>
+    struct action<directive_dw>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // DW allows arbitrarily many words to be defined at once.
+            // We have to break these into their constituent hexads.
+            while (!s.operands.empty())
+            {
+                Word word { s.operands.front() };
+                s.operands.pop();
+
+                // Words are stored little-endian
+                s.data[s.instruction_pointer++] = word.low();
+                s.data[s.instruction_pointer++] = word.middle();
+                s.data[s.instruction_pointer++] = word.high();
+            }
+        }
+    };
+
+    template<>
+    struct action<directive_zh>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // ZH creates N hexads set to 0
+            auto count { s.operands.front() };
+            s.operands.pop();
+
+            if (count < 0)
+            {
+                throw tao::pegtl::parse_error("Can't reserve a block with negative size", in);
+            }
+
+            for(auto i = 0; i < count; i++)
+            {
+                s.data[s.instruction_pointer++] = 0;
+            }
+        }
+    };
+
+    template<>
+    struct action<directive_zw>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // ZW creates N words set to 0
+            auto count { s.operands.front() };
+            s.operands.pop();
+
+            if (count < 0)
+            {
+                throw tao::pegtl::parse_error("Can't reserve a block with negative size", in);
+            }
+
+            for(auto i = 0; i < count; i++)
+            {
+                s.data[s.instruction_pointer++] = 0;
+                s.data[s.instruction_pointer++] = 0;
+                s.data[s.instruction_pointer++] = 0;
+            }
         }
     };
 
