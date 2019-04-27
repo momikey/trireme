@@ -6,6 +6,7 @@
 #include "ternary_math.hpp"
 #include "hexad.hpp"
 #include "word.hpp"
+#include "cpu.hpp"
 #include "detail/convert_impl.hpp"
 #include "detail/character_to_value.hpp"
 
@@ -47,6 +48,8 @@ int main(int, char**) {
 
     std::string sample_filename { "sandbox/sample.txt" };
     ternary::assembler::Assembler as {};
+
+    Cpu cpu {};
 
     try
     {

@@ -20,6 +20,8 @@ set(TRIREME_INCLUDES
     include/memory.hpp
     include/opcode.hpp
     include/flags.hpp
+    include/cpu.hpp
+    include/io.hpp
 )
 
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
