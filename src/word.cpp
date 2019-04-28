@@ -28,6 +28,15 @@ namespace ternary
         return result;
     }
 
+    std::string Word::raw_trit_string() const noexcept
+    {
+        auto result { high_.trit_string() };
+        result += middle_.trit_string();
+        result += low_.trit_string();
+
+        return result;
+    }
+
     addition_result add(const Word& lhs, Word rhs) noexcept
     {
         // Note: This is the only case where we *don't* use only

@@ -47,6 +47,7 @@ namespace ternary
         void set_high(Hexad h) noexcept { high_ = h; }
         void set_high(value_type h) noexcept { high_ = h; }
 
+        std::string raw_trit_string() const noexcept;
         std::string trit_string() const noexcept;
         std::string value_string() const noexcept;
 

@@ -73,4 +73,20 @@ inline Int string_to_value(const std::string& st) noexcept
     return detail::string_to_value_impl(st);
 }
 
+template<typename Int = int>
+inline char trit_to_character(const Int trit) noexcept
+{
+    switch (trit)
+    {
+        case 0:
+            return '0';
+        case 1:
+            return '+';
+        case -1:
+            return '-';
+        default:
+            return 'X';
+    }
+}
+
 #endif /* TRIREME_CONVERT_HPP */

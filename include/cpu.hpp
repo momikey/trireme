@@ -2,6 +2,8 @@
 #define TRIREME_CPU_HPP
 
 #include <array>
+#include <string>
+#include <iostream>
 
 #include "registers.hpp"
 #include "memory.hpp"
@@ -20,14 +22,22 @@ namespace ternary
 
         Cpu() = default;
 
+        Word get_register(int reg) const { return registers.get(reg); }
+        Hexad get_memory(int address) const { return memory.get(address); }
+        Word get_memory_word(int address) const
+            { return { memory.get(address+2), memory.get(address+1), memory.get(address) }; }
+
+        void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; };
+
         private:
         static constexpr auto control_register_count = 4;
         static constexpr auto debug_register_count = 4;
 
         Registers registers;
         BasicMemory memory;
-        Flags flags;
+        FlagRegister flag_register;
         Io io;
+        Word instruction_pointer;
 
         // These are special, so handle them separately
         std::array<Word, control_register_count> control_regs;
