@@ -6,31 +6,17 @@
 #include <iostream>
 
 #include "instructions.hpp"
+#include "../../flags.hpp"
 #include "../../ternary_math.hpp"
 
 namespace ternary { namespace assembler {
     using namespace tao::pegtl;
-
-    // These are the CPU flags, which are used in certain opcodes
-    enum class Flags
-    {
-        carry = 0,
-        sign,
-        direction,
-        // Flags 3 & 4 unused
-        absolute = 5,
-        binary,
-        trap,
-        interrupt,
-        protect
-        // All flags >9 unused
-    };
     
     namespace detail
     {
         // Helper functions for flags, etc.,
         // so we don't have to repeat everything.
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void set_flag_positive(const Input& in, State& s)
         {
             // PFf -+0 00+ 000 000 000 fff
@@ -40,7 +26,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void set_flag_zero(const Input& in, State& s)
         {
             // ZFf -+0 000 000 000 000 fff
@@ -50,7 +36,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void set_flag_negative(const Input& in, State& s)
         {
             // NFf -+0 00+ 000 000 000 fff
@@ -60,7 +46,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void skip_flag_positive(const Input& in, State& s)
         {
             // SPf +0+ +++ ... ... ... fff
@@ -70,7 +56,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void skip_flag_zero(const Input& in, State& s)
         {
             // SZf +0+ ++0 ... ... ... fff
@@ -80,7 +66,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void skip_flag_negative(const Input& in, State& s)
         {
             // SNf +0+ +++ ... ... ... fff
@@ -90,7 +76,7 @@ namespace ternary { namespace assembler {
             s.t = s.x = s.y = 0;
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void branch_flag_positive(const Input& in, State& s)
         {
             // BPf +++ fff
@@ -98,7 +84,7 @@ namespace ternary { namespace assembler {
             s.m = static_cast<int>(f);
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void branch_flag_zero(const Input& in, State& s)
         {
             // BZf ++0 fff
@@ -106,7 +92,7 @@ namespace ternary { namespace assembler {
             s.m = static_cast<int>(f);
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void branch_flag_negative(const Input& in, State& s)
         {
             // BNf ++- fff
@@ -114,7 +100,7 @@ namespace ternary { namespace assembler {
             s.m = static_cast<int>(f);
         }
 
-        template<Flags f, typename Input, typename State>
+        template<flags f, typename Input, typename State>
         inline void ternary_branch(const Input& in, State& s)
         {
             // TBf +0- 0-+ fff
@@ -430,7 +416,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfc";
-            return detail::set_flag_positive<Flags::carry>(in, s);
+            return detail::set_flag_positive<flags::carry>(in, s);
         }
     };
 
@@ -441,7 +427,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfs";
-            return detail::set_flag_positive<Flags::sign>(in, s);
+            return detail::set_flag_positive<flags::sign>(in, s);
         }
     };
 
@@ -452,7 +438,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfd";
-            return detail::set_flag_positive<Flags::direction>(in, s);
+            return detail::set_flag_positive<flags::direction>(in, s);
         }
     };
 
@@ -463,7 +449,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfa";
-            return detail::set_flag_positive<Flags::absolute>(in, s);
+            return detail::set_flag_positive<flags::absolute>(in, s);
         }
     };
 
@@ -474,7 +460,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfb";
-            return detail::set_flag_positive<Flags::binary>(in, s);
+            return detail::set_flag_positive<flags::binary>(in, s);
         }
     };
 
@@ -485,7 +471,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pft";
-            return detail::set_flag_positive<Flags::trap>(in, s);
+            return detail::set_flag_positive<flags::trap>(in, s);
         }
     };
 
@@ -496,7 +482,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfi";
-            return detail::set_flag_positive<Flags::interrupt>(in, s);
+            return detail::set_flag_positive<flags::interrupt>(in, s);
         }
     };
 
@@ -507,7 +493,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "pfp";
-            return detail::set_flag_positive<Flags::protect>(in, s);
+            return detail::set_flag_positive<flags::protection>(in, s);
         }
     };
 
@@ -518,7 +504,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfc";
-            return detail::set_flag_zero<Flags::carry>(in, s);
+            return detail::set_flag_zero<flags::carry>(in, s);
         }
     };
 
@@ -529,7 +515,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfs";
-            return detail::set_flag_zero<Flags::sign>(in, s);
+            return detail::set_flag_zero<flags::sign>(in, s);
         }
     };
 
@@ -540,7 +526,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfd";
-            return detail::set_flag_zero<Flags::direction>(in, s);
+            return detail::set_flag_zero<flags::direction>(in, s);
         }
     };
 
@@ -551,7 +537,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfa";
-            return detail::set_flag_zero<Flags::absolute>(in, s);
+            return detail::set_flag_zero<flags::absolute>(in, s);
         }
     };
 
@@ -562,7 +548,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfb";
-            return detail::set_flag_zero<Flags::binary>(in, s);
+            return detail::set_flag_zero<flags::binary>(in, s);
         }
     };
 
@@ -573,7 +559,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zft";
-            return detail::set_flag_zero<Flags::trap>(in, s);
+            return detail::set_flag_zero<flags::trap>(in, s);
         }
     };
 
@@ -584,7 +570,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfi";
-            return detail::set_flag_zero<Flags::interrupt>(in, s);
+            return detail::set_flag_zero<flags::interrupt>(in, s);
         }
     };
 
@@ -595,7 +581,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "zfp";
-            return detail::set_flag_zero<Flags::protect>(in, s);
+            return detail::set_flag_zero<flags::protection>(in, s);
         }
     };
 
@@ -606,7 +592,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfc";
-            return detail::set_flag_negative<Flags::carry>(in, s);
+            return detail::set_flag_negative<flags::carry>(in, s);
         }
     };
 
@@ -617,7 +603,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfs";
-            return detail::set_flag_negative<Flags::sign>(in, s);
+            return detail::set_flag_negative<flags::sign>(in, s);
         }
     };
 
@@ -628,7 +614,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfd";
-            return detail::set_flag_negative<Flags::direction>(in, s);
+            return detail::set_flag_negative<flags::direction>(in, s);
         }
     };
 
@@ -639,7 +625,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfa";
-            return detail::set_flag_negative<Flags::absolute>(in, s);
+            return detail::set_flag_negative<flags::absolute>(in, s);
         }
     };
 
@@ -650,7 +636,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfb";
-            return detail::set_flag_negative<Flags::binary>(in, s);
+            return detail::set_flag_negative<flags::binary>(in, s);
         }
     };
 
@@ -661,7 +647,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nft";
-            return detail::set_flag_negative<Flags::trap>(in, s);
+            return detail::set_flag_negative<flags::trap>(in, s);
         }
     };
 
@@ -672,7 +658,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfi";
-            return detail::set_flag_negative<Flags::interrupt>(in, s);
+            return detail::set_flag_negative<flags::interrupt>(in, s);
         }
     };
 
@@ -683,7 +669,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "nfp";
-            return detail::set_flag_negative<Flags::protect>(in, s);
+            return detail::set_flag_negative<flags::protection>(in, s);
         }
     };
 
@@ -694,7 +680,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spc";
-            return detail::skip_flag_positive<Flags::carry>(in, s);
+            return detail::skip_flag_positive<flags::carry>(in, s);
         }
     };
 
@@ -705,7 +691,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "sps";
-            return detail::skip_flag_positive<Flags::sign>(in, s);
+            return detail::skip_flag_positive<flags::sign>(in, s);
         }
     };
 
@@ -716,7 +702,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spd";
-            return detail::skip_flag_positive<Flags::direction>(in, s);
+            return detail::skip_flag_positive<flags::direction>(in, s);
         }
     };
 
@@ -727,7 +713,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spa";
-            return detail::skip_flag_positive<Flags::absolute>(in, s);
+            return detail::skip_flag_positive<flags::absolute>(in, s);
         }
     };
 
@@ -738,7 +724,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spb";
-            return detail::skip_flag_positive<Flags::binary>(in, s);
+            return detail::skip_flag_positive<flags::binary>(in, s);
         }
     };
 
@@ -749,7 +735,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spt";
-            return detail::skip_flag_positive<Flags::trap>(in, s);
+            return detail::skip_flag_positive<flags::trap>(in, s);
         }
     };
 
@@ -760,7 +746,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spi";
-            return detail::skip_flag_positive<Flags::interrupt>(in, s);
+            return detail::skip_flag_positive<flags::interrupt>(in, s);
         }
     };
 
@@ -771,7 +757,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "spp";
-            return detail::skip_flag_positive<Flags::protect>(in, s);
+            return detail::skip_flag_positive<flags::protection>(in, s);
         }
     };
 
@@ -782,7 +768,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szc";
-            return detail::skip_flag_zero<Flags::carry>(in, s);
+            return detail::skip_flag_zero<flags::carry>(in, s);
         }
     };
 
@@ -793,7 +779,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szs";
-            return detail::skip_flag_zero<Flags::sign>(in, s);
+            return detail::skip_flag_zero<flags::sign>(in, s);
         }
     };
 
@@ -804,7 +790,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szd";
-            return detail::skip_flag_zero<Flags::direction>(in, s);
+            return detail::skip_flag_zero<flags::direction>(in, s);
         }
     };
 
@@ -815,7 +801,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "sza";
-            return detail::skip_flag_zero<Flags::absolute>(in, s);
+            return detail::skip_flag_zero<flags::absolute>(in, s);
         }
     };
 
@@ -826,7 +812,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szb";
-            return detail::skip_flag_zero<Flags::binary>(in, s);
+            return detail::skip_flag_zero<flags::binary>(in, s);
         }
     };
 
@@ -837,7 +823,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szt";
-            return detail::skip_flag_zero<Flags::trap>(in, s);
+            return detail::skip_flag_zero<flags::trap>(in, s);
         }
     };
 
@@ -848,7 +834,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szi";
-            return detail::skip_flag_zero<Flags::interrupt>(in, s);
+            return detail::skip_flag_zero<flags::interrupt>(in, s);
         }
     };
 
@@ -859,7 +845,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "szp";
-            return detail::skip_flag_zero<Flags::protect>(in, s);
+            return detail::skip_flag_zero<flags::protection>(in, s);
         }
     };
 
@@ -870,7 +856,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "snc";
-            return detail::skip_flag_negative<Flags::carry>(in, s);
+            return detail::skip_flag_negative<flags::carry>(in, s);
         }
     };
 
@@ -881,7 +867,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "sns";
-            return detail::skip_flag_negative<Flags::sign>(in, s);
+            return detail::skip_flag_negative<flags::sign>(in, s);
         }
     };
 
@@ -892,7 +878,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "snd";
-            return detail::skip_flag_negative<Flags::direction>(in, s);
+            return detail::skip_flag_negative<flags::direction>(in, s);
         }
     };
 
@@ -903,7 +889,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "sna";
-            return detail::skip_flag_negative<Flags::absolute>(in, s);
+            return detail::skip_flag_negative<flags::absolute>(in, s);
         }
     };
 
@@ -914,7 +900,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "snb";
-            return detail::skip_flag_negative<Flags::binary>(in, s);
+            return detail::skip_flag_negative<flags::binary>(in, s);
         }
     };
 
@@ -925,7 +911,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "snt";
-            return detail::skip_flag_negative<Flags::trap>(in, s);
+            return detail::skip_flag_negative<flags::trap>(in, s);
         }
     };
 
@@ -936,7 +922,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "sni";
-            return detail::skip_flag_negative<Flags::interrupt>(in, s);
+            return detail::skip_flag_negative<flags::interrupt>(in, s);
         }
     };
 
@@ -947,7 +933,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "snp";
-            return detail::skip_flag_negative<Flags::protect>(in, s);
+            return detail::skip_flag_negative<flags::protection>(in, s);
         }
     };
 
@@ -1468,7 +1454,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpc";
-            return detail::branch_flag_positive<Flags::carry>(in, s);
+            return detail::branch_flag_positive<flags::carry>(in, s);
         }
     };
 
@@ -1479,7 +1465,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bps";
-            return detail::branch_flag_positive<Flags::sign>(in, s);
+            return detail::branch_flag_positive<flags::sign>(in, s);
         }
     };
 
@@ -1490,7 +1476,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpd";
-            return detail::branch_flag_positive<Flags::direction>(in, s);
+            return detail::branch_flag_positive<flags::direction>(in, s);
         }
     };
 
@@ -1501,7 +1487,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpa";
-            return detail::branch_flag_positive<Flags::absolute>(in, s);
+            return detail::branch_flag_positive<flags::absolute>(in, s);
         }
     };
 
@@ -1512,7 +1498,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpb";
-            return detail::branch_flag_positive<Flags::binary>(in, s);
+            return detail::branch_flag_positive<flags::binary>(in, s);
         }
     };
 
@@ -1523,7 +1509,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpt";
-            return detail::branch_flag_positive<Flags::trap>(in, s);
+            return detail::branch_flag_positive<flags::trap>(in, s);
         }
     };
 
@@ -1534,7 +1520,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpi";
-            return detail::branch_flag_positive<Flags::interrupt>(in, s);
+            return detail::branch_flag_positive<flags::interrupt>(in, s);
         }
     };
 
@@ -1545,7 +1531,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bpp";
-            return detail::branch_flag_positive<Flags::protect>(in, s);
+            return detail::branch_flag_positive<flags::protection>(in, s);
         }
     };
 
@@ -1556,7 +1542,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzc";
-            return detail::branch_flag_zero<Flags::carry>(in, s);
+            return detail::branch_flag_zero<flags::carry>(in, s);
         }
     };
 
@@ -1567,7 +1553,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzs";
-            return detail::branch_flag_zero<Flags::sign>(in, s);
+            return detail::branch_flag_zero<flags::sign>(in, s);
         }
     };
 
@@ -1578,7 +1564,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzd";
-            return detail::branch_flag_zero<Flags::direction>(in, s);
+            return detail::branch_flag_zero<flags::direction>(in, s);
         }
     };
 
@@ -1589,7 +1575,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bza";
-            return detail::branch_flag_zero<Flags::absolute>(in, s);
+            return detail::branch_flag_zero<flags::absolute>(in, s);
         }
     };
 
@@ -1600,7 +1586,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzb";
-            return detail::branch_flag_zero<Flags::binary>(in, s);
+            return detail::branch_flag_zero<flags::binary>(in, s);
         }
     };
 
@@ -1611,7 +1597,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzt";
-            return detail::branch_flag_zero<Flags::trap>(in, s);
+            return detail::branch_flag_zero<flags::trap>(in, s);
         }
     };
 
@@ -1622,7 +1608,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzi";
-            return detail::branch_flag_zero<Flags::interrupt>(in, s);
+            return detail::branch_flag_zero<flags::interrupt>(in, s);
         }
     };
 
@@ -1633,7 +1619,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bzp";
-            return detail::branch_flag_zero<Flags::protect>(in, s);
+            return detail::branch_flag_zero<flags::protection>(in, s);
         }
     };
 
@@ -1644,7 +1630,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bnc";
-            return detail::branch_flag_negative<Flags::carry>(in, s);
+            return detail::branch_flag_negative<flags::carry>(in, s);
         }
     };
 
@@ -1655,7 +1641,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bns";
-            return detail::branch_flag_negative<Flags::sign>(in, s);
+            return detail::branch_flag_negative<flags::sign>(in, s);
         }
     };
 
@@ -1666,7 +1652,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bnd";
-            return detail::branch_flag_negative<Flags::direction>(in, s);
+            return detail::branch_flag_negative<flags::direction>(in, s);
         }
     };
 
@@ -1677,7 +1663,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bna";
-            return detail::branch_flag_negative<Flags::absolute>(in, s);
+            return detail::branch_flag_negative<flags::absolute>(in, s);
         }
     };
 
@@ -1688,7 +1674,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bnb";
-            return detail::branch_flag_negative<Flags::binary>(in, s);
+            return detail::branch_flag_negative<flags::binary>(in, s);
         }
     };
 
@@ -1699,7 +1685,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bnt";
-            return detail::branch_flag_negative<Flags::trap>(in, s);
+            return detail::branch_flag_negative<flags::trap>(in, s);
         }
     };
 
@@ -1710,7 +1696,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bni";
-            return detail::branch_flag_negative<Flags::interrupt>(in, s);
+            return detail::branch_flag_negative<flags::interrupt>(in, s);
         }
     };
 
@@ -1721,7 +1707,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "bnp";
-            return detail::branch_flag_negative<Flags::protect>(in, s);
+            return detail::branch_flag_negative<flags::protection>(in, s);
         }
     };
 
@@ -1732,7 +1718,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbc";
-            return detail::ternary_branch<Flags::carry>(in, s);
+            return detail::ternary_branch<flags::carry>(in, s);
         }
     };
 
@@ -1743,7 +1729,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbs";
-            return detail::ternary_branch<Flags::sign>(in, s);
+            return detail::ternary_branch<flags::sign>(in, s);
         }
     };
 
@@ -1754,7 +1740,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbd";
-            return detail::ternary_branch<Flags::direction>(in, s);
+            return detail::ternary_branch<flags::direction>(in, s);
         }
     };
 
@@ -1765,7 +1751,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tba";
-            return detail::ternary_branch<Flags::absolute>(in, s);
+            return detail::ternary_branch<flags::absolute>(in, s);
         }
     };
 
@@ -1776,7 +1762,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbb";
-            return detail::ternary_branch<Flags::binary>(in, s);
+            return detail::ternary_branch<flags::binary>(in, s);
         }
     };
 
@@ -1787,7 +1773,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbt";
-            return detail::ternary_branch<Flags::trap>(in, s);
+            return detail::ternary_branch<flags::trap>(in, s);
         }
     };
 
@@ -1798,7 +1784,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbi";
-            return detail::ternary_branch<Flags::interrupt>(in, s);
+            return detail::ternary_branch<flags::interrupt>(in, s);
         }
     };
 
@@ -1809,7 +1795,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             s.op = "tbp";
-            return detail::ternary_branch<Flags::protect>(in, s);
+            return detail::ternary_branch<flags::protection>(in, s);
         }
     };
 
