@@ -14,22 +14,7 @@ namespace ternary
         Opcode(const Word& w);
         Opcode(int n): Opcode(Word{n}) {}
 
-        Word get() const { return opcode_; }
-
-        int o_field() const { return o_; }
-        int m_field() const { return m_; }
-        int t_field() const { return t_; }
-        int x_field() const { return x_; }
-        int y_field() const { return y_; }
-        int z_field() const { return z_; }
-
-        int low6() const;
-        int low9() const;
-        int low12() const;
-
-        private:
-        // The opcode itself
-        Word opcode_;
+        const Word value;
 
         // Fields in the opcode
         // Different operations can have different fields,
@@ -47,12 +32,16 @@ namespace ternary
         //
         // We store these as `int`s for convenience.
 
-        int o_;
-        int m_;
-        int t_;
-        int x_;
-        int y_;
-        int z_;
+        const int o;
+        const int m;
+        const int t;
+        const int x;
+        const int y;
+        const int z;
+
+        int low6() const;
+        int low9() const;
+        int low12() const;
     };
 }
 
