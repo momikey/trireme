@@ -47,5 +47,20 @@ int main(int, char**) {
     ternary::assembler::Assembler as {};
 
     Cpu cpu {};
+
+    Opcode o1 { 9, 10, 0, 0, 1, -1 };
+    cpu.debug_set_memory(26, -123);
+    cpu.debug_set_memory(27, 123);
+    cpu.debug_set_memory(28, 42);
+    std::cout << cpu.get_memory(26).value_string() << '\n';
+    cpu.debug_decode_instruction(o1);
+    std::cout << cpu.get_register(10) << '\n';
     cpu.debug_print_flags();
+
+    Opcode o2 { -9, 10, 0, 0, 0, -9 };
+    cpu.debug_decode_instruction(o2);
+    std::cout
+        << cpu.get_memory(-9).value_string() << ' '
+        << cpu.get_memory(-8).value_string() << ' '
+        << cpu.get_memory(-7).value_string() << '\n';
 }

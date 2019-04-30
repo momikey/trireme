@@ -2,6 +2,7 @@
 #define TRIREME_OPCODE_HPP
 
 #include "word.hpp"
+#include "hexad.hpp"
 #include "ternary_math.hpp"
 
 namespace ternary
@@ -13,6 +14,8 @@ namespace ternary
 
         Opcode(const Word& w);
         Opcode(int n): Opcode(Word{n}) {}
+        Opcode(Hexad h, Hexad m, Hexad l): Opcode(Word{h, m, l}) {}
+        Opcode(int o, int m_, int t_, int x_, int y_, int z_);
 
         const Word value;
 

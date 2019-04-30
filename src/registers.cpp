@@ -39,7 +39,7 @@ namespace ternary
             return;
         }
         
-        if (r == 0)
+        if (r >= 0)
         {
             general[clamp_address(r)] = w.value();
         }

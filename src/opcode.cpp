@@ -13,6 +13,11 @@ namespace ternary
         z(low_trits(w.low().get(), 3))
     {}
 
+    Opcode::Opcode(int o_, int m_, int t_, int x_, int y_, int z_):
+        value({o_ * pow3(3) + m_, t_ * pow3(3) + x_, y_ * pow3(3) + z_}),
+        o(o_), m(m_), t(t_), x(x_), y(y_), z(z_)
+    {}
+
     int Opcode::low6() const
     {
         return y * pow3(3) + z;

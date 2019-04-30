@@ -9,7 +9,7 @@ namespace ternary {
         const std::string trits { w_.raw_trit_string() };
 
         return std::inner_product(
-            trits.crbegin(), trits.crend(),
+            trits.cbegin(), trits.cend(),
             all_flags.cbegin(),
             std::string {},
             std::plus<>(),

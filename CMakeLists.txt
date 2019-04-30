@@ -33,6 +33,7 @@ set(TRIREME_SOURCES
     src/memory.cpp
     src/opcode.cpp
     src/flags.cpp
+    src/cpu.cpp
 )
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})
