@@ -14,6 +14,8 @@ namespace ternary
                 undefined_opcode(op);
                 break;
             case 4:
+                decode_minor_arithmetic(op);
+                break;
             case 5:
                 load_register_memory(op.m, op.low12(), hexad_select::low);
                 break;
@@ -29,8 +31,14 @@ namespace ternary
                 break;
             case 10:
             case 11:
+                branch_on_flag(op.low12(), op.m, -1);
+                break;
             case 12:
+                branch_on_flag(op.low12(), op.m, 0);
+                break;
             case 13:
+                branch_on_flag(op.low12(), op.m, 1);
+                break;
             case -1:
                 undefined_opcode(op);
                 break;
@@ -73,8 +81,14 @@ namespace ternary
         }
     }
 
+    void Cpu::decode_minor_arithmetic(Opcode& op)
+    {
+        
+    }
+
     void Cpu::undefined_opcode(Opcode& op)
     {
+        // TODO: Trap and issue a simulated CPU interrupt
         std::cerr << "Undefined operation " << op.value.value_string() << '\n';
     }
 
@@ -149,5 +163,13 @@ namespace ternary
         }
 
         flag_register.set_flag(flags::sign, sign_c(r.value()));
+    }
+
+    void Cpu::branch_on_flag(const int addr, const int flag, const int target)
+    {
+        if (flag_register.get_flag(static_cast<flags>(flag)) == target)
+        {
+            instruction_pointer = { addr };
+        }
     }
 }

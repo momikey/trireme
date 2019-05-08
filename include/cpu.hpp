@@ -60,7 +60,33 @@ namespace ternary
         // Internal methods begin here
 
         // Instruction decoding
+
+        // Primary instruction decoder
         void decode_major(Opcode&);
+
+        // Decoding for system instructions (O field = 0)
+        void decode_minor_system(Opcode&);
+
+        // Decoding for tritwise instructions (O field = 1)
+        void decode_minor_tritwise(Opcode&);
+
+        // Decoding for complex arithmetic/conversion instructions (O field = 2)
+        void decode_minor_complex(Opcode&);
+
+        // Decoding for arithmetic instructions (O field = 4)
+        void decode_minor_arithmetic(Opcode&);
+
+        // Decoding for register instructions (O field = 8)
+        void decode_minor_register(Opcode&);
+
+        // Decoding for branch/skip insstructions (O field = 10)
+        void decode_minor_branch(Opcode&);
+
+        // Decoding for I/O instructions (O field = -8)
+        void decode_minor_io(Opcode&);
+
+        // Decoding for indirect memory instructions (O field = -10)
+        void deocde_minor_indirect(Opcode&);
 
         // Instructions
         // These are not 1-to-1 with processor instructions.
@@ -68,6 +94,10 @@ namespace ternary
         void load_register_memory(const int reg, const int addr, hexad_select type);
         void load_register_immediate(const int reg, const int value, hexad_select type);
         void store_register_memory(const int reg, const int addr, hexad_select type);
+
+        void branch_on_flag(const int addr, const int flag, const int target);
+
+        void undefined_opcode(Opcode& op);
 
         // Helpers to construct values from 3-trit "triads"
         int value_6(int x, int y) { return x* pow3(3) + y; }
