@@ -83,7 +83,35 @@ namespace ternary
 
     void Cpu::decode_minor_arithmetic(Opcode& op)
     {
-        
+        switch (op.m)
+        {
+            case 9:
+                add_subtract_register(op.x, op.y, op.z, false);
+                break;
+            case 11:
+                add_subtract_immediate(op.t, op.t, op.low9(), false);
+                break;
+            case 12:
+                add_subtract_carry(op.x, op.y, op.z, false);
+                break;
+            case 13:
+                add_subtract_immediate(op.t, op.x, op.low6(), false);
+                break;
+            case -6:
+                add_subtract_immediate(op.t, op.x, op.low6(), true);
+                break;
+            case -8:
+                add_subtract_immediate(op.t, op.t, op.low9(), true);
+                break;
+            case -9:
+                add_subtract_register(op.x, op.y, op.z, true);
+                break;
+            case -10:
+                add_subtract_carry(op.x, op.y, op.z, true);
+                break;
+            default:
+                break;
+        }
     }
 
     void Cpu::undefined_opcode(Opcode& op)
@@ -171,5 +199,43 @@ namespace ternary
         {
             instruction_pointer = { addr };
         }
+    }
+
+    void Cpu::add_subtract_register(const int srcreg1, const int srcreg2, const int destreg, const bool subtract)
+    {
+        auto src1 { registers.get(srcreg1) };
+        auto src2 { registers.get(srcreg2) };
+
+        auto result { subtract ? sub(src1, src2) : add(src1, src2) };
+
+        registers.set(destreg, result.first);
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::add_subtract_carry(const int srcreg1, const int srcreg2, const int destreg, const bool subtract)
+    {
+        auto src1 { registers.get(srcreg1) };
+        auto src2 { registers.get(srcreg2) };
+        auto carry { flag_register.get_flag(flags::carry) };
+
+        auto result { subtract ? sub(src1, src2) : add(src1, src2) };
+        auto with_carry { subtract ? sub(result.first, carry) : add(result.first, carry) };
+        auto final_carry { result.second + with_carry.second };
+
+        registers.set(destreg, with_carry.first);
+        flag_register.set_flag(flags::carry, final_carry);
+        flag_register.set_flag(flags::sign, sign_c(with_carry.first.value()));
+    }
+
+    void Cpu::add_subtract_immediate(const int srcreg, const int destreg, const int immediate, const bool subtract)
+    {
+        auto src { registers.get(srcreg) };
+
+        auto result { subtract ? sub(src, immediate) : add(src, immediate) };
+
+        registers.set(destreg, result.first);
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
     }
 }

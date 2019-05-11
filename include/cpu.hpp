@@ -41,6 +41,7 @@ namespace ternary
         void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
         void debug_decode_instruction(Opcode& op) { decode_major(op); }
         void debug_set_memory(int addr, int value) { memory.set(addr, value); }
+        void debug_set_register(int reg, int value) { registers.set(reg, value); }
 
         private:
         static constexpr auto control_register_count = 4;
@@ -96,6 +97,10 @@ namespace ternary
         void store_register_memory(const int reg, const int addr, hexad_select type);
 
         void branch_on_flag(const int addr, const int flag, const int target);
+
+        void add_subtract_register(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
+        void add_subtract_carry(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
+        void add_subtract_immediate(const int srcreg, const int destreg, const int immediate, const bool subtract);
 
         void undefined_opcode(Opcode& op);
 
