@@ -9,6 +9,8 @@ namespace ternary
             case 0:
             case 1:
             case 2:
+                decode_minor_complex(op);
+                break;
             case 3:
                 // %C.... is undefined on the basic architecture
                 undefined_opcode(op);
@@ -109,6 +111,46 @@ namespace ternary
                 break;
             case -10:
                 add_subtract_carry(op.x, op.y, op.z, true);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_complex(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 1:
+                register_conversion(op.y, op.z, bin);
+                break;
+            case 2:
+                register_conversion(op.y, op.z, rdr);
+                break;
+            case 4:
+                register_conversion(op.y, op.z, fdr);
+                break;
+            case 9:
+                divide_register(op.x, op.y, op.z);
+                break;
+            case 12:
+                multiply_register(op.x, op.y, op.z);
+                break;
+            case -1:
+                register_conversion(op.y, op.z, tri);
+                break;
+            case -6:
+                multiply_immediate(op.t, op.x, op.low6());
+                break;
+            case -7:
+                multiply_immediate(op.t, op.t, op.low9());
+                break;
+            case -9:
+                divide_immediate(op.t, op.x, op.low6());
+                break;
+            case -10:
+                divide_immediate(op.t, op.t, op.low9());
                 break;
             default:
                 undefined_opcode(op);
@@ -239,5 +281,118 @@ namespace ternary
         registers.set(destreg, result.first);
         flag_register.set_flag(flags::carry, result.second);
         flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::multiply_register(const int srcreg1, const int srcreg2, const int destreg)
+    {
+        auto src1 { registers.get(srcreg1) };
+        auto src2 { registers.get(srcreg2) };
+
+        auto result { mul(src1, src2) };
+
+        registers.set(destreg, result.first);
+        // ro = high word of result
+        registers.set(-2, result.second);
+
+        flag_register.set_flag(flags::carry, sign_c(result.second.value()));
+        flag_register.set_flag(flags::sign, result.second.value() ? 
+            sign_c(result.second.value()) : sign_c(result.first.value()));
+    }
+
+    void Cpu::multiply_immediate(const int srcreg, const int destreg, const int immediate)
+    {
+        auto src { registers.get(srcreg) };
+        auto result { mul(src, immediate) };
+
+        registers.set(destreg, result.first);
+        // ro = high word of result
+        registers.set(-2, result.second);
+
+        flag_register.set_flag(flags::carry, sign_c(result.second.value()));
+        flag_register.set_flag(flags::sign, result.second.value() ? 
+            sign_c(result.second.value()) : sign_c(result.first.value()));
+    }
+
+    void Cpu::divide_register(const int srcreg1, const int srcreg2, const int destreg)
+    {
+        if (registers.get(srcreg2).value())
+        {
+            auto src1 { registers.get(srcreg1) };
+            auto src2 { registers.get(srcreg2) };
+
+            // ro = high word of dividend
+            auto highword { registers.get(-2) };
+            division_dividend di { highword, src1 };
+
+            auto result { div(di, src2) };
+
+            registers.set(destreg, result.first.value());
+            // ru = remainder
+            registers.set(-8, result.second.value());
+
+            // Check for overflow
+            if (result.first.value() * src2.value() + result.second.value() !=
+                highword.value() * static_cast<long long int>(pow3(Word::word_size)) + src2.value())
+            {
+                flag_register.set_flag(flags::carry, highword.value() ?
+                    sign_c(highword.value()) : sign_c(src2.value()));
+            }
+            else
+            {
+                flag_register.set_flag(flags::carry, 0);
+            }
+
+            flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+        }
+        else
+        {
+            // Divide by zero
+        }
+        
+    }
+
+    void Cpu::divide_immediate(const int srcreg, const int destreg, const int immediate)
+    {
+        if (immediate)
+        {
+            auto src { registers.get(srcreg) };
+
+            // ro = high word of dividend
+            auto highword { registers.get(-2) };
+            division_dividend di { highword, src };
+
+            auto result { div(di, immediate) };
+
+            registers.set(destreg, result.first.value());
+            // ru = remainder
+            registers.set(-8, result.second.value());
+
+            // Check for overflow
+            if (result.first.value() * immediate + result.second.value() !=
+                highword.value() * static_cast<long long int>(pow3(Word::word_size)) + immediate)
+            {
+                flag_register.set_flag(flags::carry, highword.value() ?
+                    sign_c(highword.value()) : sign_c(immediate));
+            }
+            else
+            {
+                flag_register.set_flag(flags::carry, 0);
+            }
+
+            flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+        }
+        else
+        {
+            // Divide by zero
+        }        
+    }
+
+    void Cpu::register_conversion(const int srcreg, const int destreg, std::function<Word(const Word&)> fun)
+    {
+        auto src { registers.get(srcreg) };
+
+        registers.set(destreg, fun(src));
+
+        // conversions don't affect flags
     }
 }

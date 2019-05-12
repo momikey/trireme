@@ -48,15 +48,16 @@ int main(int, char**) {
 
     Cpu cpu {};
 
-    Opcode o1 { 4, 13, -13, 1, 2, -10 };    // adi rA, rz, 44
-    Opcode o2 { 4, -8, 1, 0, 0, 13 };    // psb r!, 13
+    cpu.debug_set_register(2, 2);
+
+    Opcode o1 { 2, 4, 0, 0, 2, 3 };
 
     cpu.debug_decode_instruction(o1);
-    std::cout << cpu.get_register(1) << '\n';
-    cpu.debug_print_flags();
+    std::cout << cpu.get_register(3) << '\n';
+    // cpu.debug_print_flags();
 
-    cpu.debug_decode_instruction(o2);
-    std::cout << cpu.get_register(1) << '\n';
+    // cpu.debug_decode_instruction(o2);
+    std::cout << cpu.get_register(-8) << '\n';
     cpu.debug_print_flags();
 
 }

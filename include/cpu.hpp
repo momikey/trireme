@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <functional>
 
 #include "registers.hpp"
 #include "memory.hpp"
@@ -101,6 +102,12 @@ namespace ternary
         void add_subtract_register(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
         void add_subtract_carry(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
         void add_subtract_immediate(const int srcreg, const int destreg, const int immediate, const bool subtract);
+        void multiply_register(const int srcreg1, const int srcreg2, const int destreg);
+        void multiply_immediate(const int srcreg, const int destreg, const int immediate);
+        void divide_register(const int srcreg1, const int srcreg2, const int destreg);
+        void divide_immediate(const int srcreg, const int destreg, const int immediate);
+
+        void register_conversion(const int srcreg, const int destreg, std::function<Word(const Word&)> fun);
 
         void undefined_opcode(Opcode& op);
 
