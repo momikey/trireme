@@ -77,6 +77,7 @@ namespace ternary
                 break;
 
             default:
+                undefined_opcode(op);
                 break;
         }
     }
@@ -110,6 +111,7 @@ namespace ternary
                 add_subtract_carry(op.x, op.y, op.z, true);
                 break;
             default:
+                undefined_opcode(op);
                 break;
         }
     }
