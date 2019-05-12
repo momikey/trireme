@@ -8,6 +8,8 @@ namespace ternary
         {
             case 0:
             case 1:
+                decode_minor_tritwise(op);
+                break;
             case 2:
                 decode_minor_complex(op);
                 break;
@@ -78,6 +80,61 @@ namespace ternary
                 store_register_memory(op.m, op.low12(), hexad_select::low);
                 break;
 
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_tritwise(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 0:
+                invert_register(op.z, sti);
+                break;
+            case 1:
+                invert_register(op.z, pti);
+                break;
+            case 8:
+                logical_register(op.x, op.y, op.z, min);
+                break;
+            case 9:
+                logical_register(op.x, op.y, op.z, teq);
+                break;
+            case 10:
+                logical_register(op.x, op.y, op.z, max);
+                break;
+            case 11:
+                logical_register(op.x, op.y, op.z, tem);
+                break;
+            case -1:
+                invert_register(op.z, nti);
+                break;
+            case -5:
+                rotate_register(op.x, op.low6(), false);
+                break;
+            case -7:
+                rotate_register(op.x, op.low6(), true);
+                break;
+            case -8:
+                compare_immediate(op.y, op.low6());
+                break;
+            case -9:
+                compare_register(op.y, op.z);
+                break;
+            case -10:
+                rotate_register_carry(op.x, op.low6(), true);
+                break;
+            case -11:
+                shift_register(op.x, op.low6(), false);
+                break;
+            case -12:
+                rotate_register_carry(op.x, op.low6(), false);
+                break;
+            case -13:
+                shift_register(op.x, op.low6(), true);
+                break;
             default:
                 undefined_opcode(op);
                 break;
@@ -387,12 +444,91 @@ namespace ternary
         }        
     }
 
-    void Cpu::register_conversion(const int srcreg, const int destreg, std::function<Word(const Word&)> fun)
+    void Cpu::register_conversion(const int srcreg, const int destreg, unary_function fun)
     {
         auto src { registers.get(srcreg) };
 
         registers.set(destreg, fun(src));
 
         // conversions don't affect flags
+    }
+
+    void Cpu::invert_register(const int reg, unary_function fun)
+    {
+        auto src { registers.get(reg) };
+
+        registers.set(reg, fun(src));
+
+        flag_register.set_flag(flags::sign, sign_c(registers.get(reg).value()));
+    }
+
+    void Cpu::logical_register(const int srcreg1, const int srcreg2, const int destreg, binary_function fun)
+    {
+        auto src1 { registers.get(srcreg1) };
+        auto src2 { registers.get(srcreg2) };
+
+        auto result { fun(src1, src2) };
+
+        registers.set(destreg, result);
+
+        flag_register.set_flag(flags::sign, sign_c(result.value()));
+    }
+
+    void Cpu::compare_register(const int lreg, const int rreg)
+    {
+        auto lhs { registers.get(lreg) };
+        auto rhs { registers.get(rreg) };
+
+        auto result { sub(lhs, rhs) };
+
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::compare_immediate(const int reg, const int immediate)
+    {
+        auto lhs { registers.get(reg) };
+
+        auto result { sub(lhs, immediate) };
+
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::shift_register(const int reg, const int places, bool right)
+    {
+        auto value { registers.get(reg) };
+
+        auto result { right ? shr(value, low_trits(places, 4)) : shl(value, low_trits(places, 4)) };
+
+        registers.set(reg, result.first);
+
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::rotate_register(const int reg, const int places, bool right)
+    {
+        auto value { registers.get(reg) };
+
+        auto result { right ? ror(value, low_trits(places, 4)) : rol(value, low_trits(places, 4)) };
+
+        registers.set(reg, result.first);
+
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::rotate_register_carry(const int reg, const int places, bool right)
+    {
+        auto value { registers.get(reg) };
+        auto carry { flag_register.get_flag(flags::carry )};
+
+        auto result { right ? rcr(value, carry, low_trits(places, 4))
+            : rcl(value, carry, low_trits(places, 4)) };
+
+        registers.set(reg, result.first);
+
+        flag_register.set_flag(flags::carry, result.second);
+        flag_register.set_flag(flags::sign, sign_c(result.first.value()));
     }
 }

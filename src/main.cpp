@@ -48,16 +48,12 @@ int main(int, char**) {
 
     Cpu cpu {};
 
-    cpu.debug_set_register(2, 2);
+    cpu.debug_set_register(2, 123);
 
-    Opcode o1 { 2, 4, 0, 0, 2, 3 };
+    Opcode o1 { 1, -13, 0, 2, 0, 4 };   // shr rB, 4
 
     cpu.debug_decode_instruction(o1);
-    std::cout << cpu.get_register(3) << '\n';
-    // cpu.debug_print_flags();
-
-    // cpu.debug_decode_instruction(o2);
-    std::cout << cpu.get_register(-8) << '\n';
+    std::cout << cpu.get_register(2) << '\n';
     cpu.debug_print_flags();
 
 }

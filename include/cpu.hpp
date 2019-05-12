@@ -59,6 +59,10 @@ namespace ternary
         std::array<Word, control_register_count> control_regs;
         std::array<Word, debug_register_count> debug_regs;
 
+        private:
+        using unary_function = std::function<Word(const Word&)>;
+        using binary_function = std::function<Word(const Word&, const Word&)>;
+
         // Internal methods begin here
 
         // Instruction decoding
@@ -88,7 +92,10 @@ namespace ternary
         void decode_minor_io(Opcode&);
 
         // Decoding for indirect memory instructions (O field = -10)
-        void deocde_minor_indirect(Opcode&);
+        void decode_minor_indirect(Opcode&);
+
+        // Decoding for the tertiary operations with O field = 8 and M field = 1
+        void decode_tertiary_HA(Opcode&);
 
         // Instructions
         // These are not 1-to-1 with processor instructions.
@@ -107,7 +114,17 @@ namespace ternary
         void divide_register(const int srcreg1, const int srcreg2, const int destreg);
         void divide_immediate(const int srcreg, const int destreg, const int immediate);
 
-        void register_conversion(const int srcreg, const int destreg, std::function<Word(const Word&)> fun);
+        void register_conversion(const int srcreg, const int destreg, unary_function fun);
+
+        void invert_register(const int reg, unary_function fun);
+        void logical_register(const int srcreg1, const int srcreg2, const int destreg, binary_function fun);
+
+        void compare_register(const int lreg, const int rreg);
+        void compare_immediate(const int reg, const int immediate);
+
+        void shift_register(const int reg, const int places, bool right);
+        void rotate_register(const int reg, const int places, bool right);
+        void rotate_register_carry(const int reg, const int places, bool right);
 
         void undefined_opcode(Opcode& op);
 
