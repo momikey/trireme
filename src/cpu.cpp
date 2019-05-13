@@ -30,6 +30,8 @@ namespace ternary
                 load_register_memory(op.m, op.low12(), hexad_select::high);
                 break;
             case 8:
+                decode_minor_register(op);
+                break;
             case 9:
                 load_register_memory(op.m, op.low12(), hexad_select::full_word);
                 break;
@@ -215,10 +217,108 @@ namespace ternary
         }
     }
 
+    void Cpu::decode_minor_register(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 0:
+                load_register_immediate(op.x, op.low6(), hexad_select::full_word);
+                break;
+            case 1:
+                decode_tertiary_HA(op);
+                break;
+            case 2:
+                load_register_immediate(op.x, op.low6(), hexad_select::low);
+                break;
+            case 3:
+                load_register_immediate(op.x, op.low6(), hexad_select::middle);
+                break;
+            case 4:
+                load_register_immediate(op.x, op.low6(), hexad_select::high);
+                break;
+            case 5:
+                load_register_indirect(op.y, op.z, hexad_select::low);
+                break;
+            case 6:
+                load_register_indirect(op.y, op.z, hexad_select::middle);
+                break;
+            case 7:
+                load_register_indirect(op.y, op.z, hexad_select::high);
+                break;
+            case 9:
+                load_register_indirect(op.y, op.z, hexad_select::full_word);
+                break;
+            case -1:
+                // Note swapped order!!!
+                move_register(op.z, op.y);
+                break;
+            case -4:
+                exchange_registers(op.y, op.z);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_tertiary_HA(Opcode& op)
+    {
+        switch (op.t)
+        {
+            case 0:
+                set_register(op.y, 0);
+                break;
+            case 1:
+                set_register(op.y, 1);
+                break;
+            case -1:
+                set_register(op.y, -1);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
     void Cpu::undefined_opcode(Opcode& op)
     {
         // TODO: Trap and issue a simulated CPU interrupt
         std::cerr << "Undefined operation " << op.value.value_string() << '\n';
+    }
+
+    void Cpu::load_register_immediate(const int reg, const int value, hexad_select type)
+    {
+        if (type == hexad_select::full_word)
+        {
+            Word w { 0, 0, value };
+            registers.set(reg, w);
+        }
+        else
+        {
+            Hexad h { value };
+            Word current { registers.get(reg) };
+
+            switch (type)
+            {
+                case hexad_select::low:
+                    current.set_low(h);
+                    break;
+
+                case hexad_select::middle:
+                    current.set_middle(h);
+                    break;
+                
+                case hexad_select::high:
+                    current.set_high(h);
+                    break;
+            
+                default:
+                    assert(0);
+                    break;
+            }
+
+            registers.set(reg, current);
+        }
     }
 
     void Cpu::load_register_memory(const int reg, const int addr, hexad_select type)
@@ -260,6 +360,80 @@ namespace ternary
         }
     }
 
+    void Cpu::load_register_indirect(const int addrreg, const int destreg, hexad_select type)
+    {
+        auto address { registers.get(addrreg) };
+        auto current { registers.get(destreg) };
+
+        // If the A flag is set +, use it as a base
+        if (flag_register.get_flag(flags::absolute) == 1)
+        {
+            address = add(address, registers.get(-3)).first;
+        }
+
+        // On the basic architecture, clear high hexad
+        // TODO: Implement advanced architecture w/18-trit address space
+        address.set_high(0);
+
+        if (type == hexad_select::full_word)
+        {
+            // Do it this way to handle potential overflow if accessing
+            // locations at the edge of memory.
+            Word w { 0, 0, 0 };
+
+            // Temporary so we don't clobber our existing address
+            auto temp { address };
+
+            w.set_low(memory.get(temp.value()));
+
+            temp = (add(temp, 1).first);
+            temp.set_high(0);
+            w.set_middle(memory.get(temp.value()));
+
+            temp = (add(temp, 1).first);
+            temp.set_high(0);
+            w.set_high(memory.get(temp.value()));
+
+            current.set(w);
+        }
+        else
+        {
+            auto data { memory.get(address.value()) };
+
+            switch (type)
+            {
+            case hexad_select::low:
+                current.set_low(data);
+                break;
+            case hexad_select::middle:
+                current.set_middle(data);
+                break;
+            case hexad_select::high:
+                current.set_high(data);
+                break;
+            default:
+                break;
+            }
+
+        }
+
+        registers.set(destreg, current);
+
+        flag_register.set_flag(flags::sign, sign_c(current.value()));
+    }
+
+    void Cpu::load_register_indexed(const int destreg, const int addr)
+    {
+        auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
+        
+        if (flag_register.get_flag(flags::direction))
+        {
+            registers.set(destreg, add(address, 3).first);
+        }
+
+        // flag_register.set_flag(flags::sign, sign_c(current.value()));
+    }
+
     void Cpu::store_register_memory(const int reg, const int addr, hexad_select type)
     {
         Word r { registers.get(reg) };
@@ -292,6 +466,75 @@ namespace ternary
         }
 
         flag_register.set_flag(flags::sign, sign_c(r.value()));
+    }
+
+    void Cpu::store_register_indirect(const int srcreg, const int addrreg, hexad_select type)
+    {
+        auto address { registers.get(addrreg) };
+        auto current { registers.get(srcreg) };
+
+        // If the A flag is set +, use it as a base
+        if (flag_register.get_flag(flags::absolute) == 1)
+        {
+            address = add(address, registers.get(-3)).first;
+        }
+
+        // On the basic architecture, clear high hexad
+        // TODO: Implement advanced architecture w/18-trit address space
+        address.set_high(0);
+
+        if (type == hexad_select::full_word)
+        {
+            // Temporary so we don't clobber address
+            auto temp { address };
+
+            memory.set(temp.value(), current.low().get());
+
+            temp = (add(temp, 1).first);
+            temp.set_high(0);
+
+            memory.set(temp.value(), current.middle().get());
+
+            temp = (add(temp, 1).first);
+            temp.set_high(0);
+
+            memory.set(temp.value(), current.high().get());
+        }
+        else
+        {
+            switch (type)
+            {
+                 case hexad_select::low:
+                    memory.set(address.value(), current.low().get());
+                    break;
+
+                case hexad_select::middle:
+                    memory.set(address.value(), current.middle().get());
+                    break;
+                
+                case hexad_select::high:
+                    memory.set(address.value(), current.high().get());
+                    break;
+            
+                default:
+                    assert(0);
+                    break;               
+            }
+        }
+
+        flag_register.set_flag(flags::sign, sign_c(current.value()));
+    }
+
+    void Cpu::store_register_indexed(const int srcreg, const int addr)
+    {
+        auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
+
+        if (flag_register.get_flag(flags::direction))
+        {
+            registers.set(srcreg, add(address, 3).first);
+        }
+
+        // flag_register.set_flag(flags::sign, sign_c(current.value()));
     }
 
     void Cpu::branch_on_flag(const int addr, const int flag, const int target)
@@ -530,5 +773,22 @@ namespace ternary
 
         flag_register.set_flag(flags::carry, result.second);
         flag_register.set_flag(flags::sign, sign_c(result.first.value()));
+    }
+
+    void Cpu::set_register(const int reg, const int value)
+    {
+        registers.set(reg, value * (pow3(Word::word_size)/2));
+    }
+
+    void Cpu::move_register(const int srcreg, const int destreg)
+    {
+        registers.set(destreg, registers.get(srcreg));
+    }
+
+    void Cpu::exchange_registers(const int lreg, const int rreg)
+    {
+        auto temp { registers.get(lreg) };
+        registers.set(lreg, registers.get(rreg));
+        registers.set(rreg, temp);
     }
 }

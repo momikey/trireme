@@ -40,6 +40,7 @@ namespace ternary
             { return { memory.get(address+2), memory.get(address+1), memory.get(address) }; }
 
         void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
+        void debug_set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
         void debug_decode_instruction(Opcode& op) { decode_major(op); }
         void debug_set_memory(int addr, int value) { memory.set(addr, value); }
         void debug_set_register(int reg, int value) { registers.set(reg, value); }
@@ -102,7 +103,11 @@ namespace ternary
         // Instead, we merge those with similar functions and layouts.
         void load_register_memory(const int reg, const int addr, hexad_select type);
         void load_register_immediate(const int reg, const int value, hexad_select type);
+        void load_register_indirect(const int addrreg, const int destreg, hexad_select type);
+        void load_register_indexed(const int destreg, const int addr);
         void store_register_memory(const int reg, const int addr, hexad_select type);
+        void store_register_indirect(const int srcreg, const int addrreg, hexad_select type);
+        void store_register_indexed(const int srcreg, const int addr);
 
         void branch_on_flag(const int addr, const int flag, const int target);
 
@@ -125,6 +130,10 @@ namespace ternary
         void shift_register(const int reg, const int places, bool right);
         void rotate_register(const int reg, const int places, bool right);
         void rotate_register_carry(const int reg, const int places, bool right);
+
+        void set_register(const int reg, const int value);
+        void move_register(const int srcreg, const int destreg);
+        void exchange_registers(const int lreg, const int rreg);
 
         void undefined_opcode(Opcode& op);
 

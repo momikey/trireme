@@ -40,6 +40,10 @@ namespace ternary
         constexpr Hexad middle() const noexcept { return middle_; }
         constexpr Hexad high() const noexcept { return high_; }
 
+        void set(value_type h, value_type m, value_type l)
+            { high_ = h; middle_ = m; low_ = l; }
+        void set(Word w) { high_ = w.high(); middle_ = w.middle(); low_ = w.low(); }
+
         void set_low(Hexad l) noexcept { low_ = l; }
         void set_low(value_type l) noexcept { low_ = l; }
         void set_middle(Hexad m) noexcept { middle_ = m; }

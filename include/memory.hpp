@@ -21,6 +21,8 @@ namespace ternary
         void set(int address, const Hexad& value) noexcept { memory_[with_offset(address)] = value; }
         void set(int address, int value) noexcept { memory_[with_offset(address)] = { value }; }
 
+        Word get_word(int address) const;
+
         private:
         // We use this for a number of calculations, including
         // all memory accesses. (Is there a better way to do it?)
