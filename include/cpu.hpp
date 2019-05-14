@@ -37,7 +37,7 @@ namespace ternary
         Word get_register(int reg) const { return registers.get(reg); }
         Hexad get_memory(int address) const { return memory.get(address); }
         Word get_memory_word(int address) const
-            { return { memory.get(address+2), memory.get(address+1), memory.get(address) }; }
+            { return { memory.get_word(address) }; }
 
         void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
         void debug_set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
@@ -108,6 +108,8 @@ namespace ternary
         void store_register_memory(const int reg, const int addr, hexad_select type);
         void store_register_indirect(const int srcreg, const int addrreg, hexad_select type);
         void store_register_indexed(const int srcreg, const int addr);
+        void push_register(const int reg);
+        void pop_register(const int reg);
 
         void branch_on_flag(const int addr, const int flag, const int target);
 

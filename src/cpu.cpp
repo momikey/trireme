@@ -248,6 +248,12 @@ namespace ternary
             case 9:
                 load_register_indirect(op.y, op.z, hexad_select::full_word);
                 break;
+            case 11:
+                push_register(op.z);
+                break;
+            case 13:
+                pop_register(op.z);
+                break;
             case -1:
                 // Note swapped order!!!
                 move_register(op.z, op.y);
@@ -325,7 +331,7 @@ namespace ternary
     {
         if (type == hexad_select::full_word)
         {
-            Word w { memory.get(addr+2), memory.get(addr+1), memory.get(addr) };
+            Word w { memory.get_word(addr) };
             registers.set(reg, w);
 
             flag_register.set_flag(flags::sign, sign_c(w.value()));
@@ -377,24 +383,7 @@ namespace ternary
 
         if (type == hexad_select::full_word)
         {
-            // Do it this way to handle potential overflow if accessing
-            // locations at the edge of memory.
-            Word w { 0, 0, 0 };
-
-            // Temporary so we don't clobber our existing address
-            auto temp { address };
-
-            w.set_low(memory.get(temp.value()));
-
-            temp = (add(temp, 1).first);
-            temp.set_high(0);
-            w.set_middle(memory.get(temp.value()));
-
-            temp = (add(temp, 1).first);
-            temp.set_high(0);
-            w.set_high(memory.get(temp.value()));
-
-            current.set(w);
+            current.set(memory.get_word(address.value()));
         }
         else
         {
@@ -425,13 +414,15 @@ namespace ternary
     void Cpu::load_register_indexed(const int destreg, const int addr)
     {
         auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
+
+        registers.set(destreg, memory.get_word(address));
         
         if (flag_register.get_flag(flags::direction))
         {
             registers.set(destreg, add(address, 3).first);
         }
 
-        // flag_register.set_flag(flags::sign, sign_c(current.value()));
+        flag_register.set_flag(flags::sign, sign_c(registers.get(destreg).value()));
     }
 
     void Cpu::store_register_memory(const int reg, const int addr, hexad_select type)
@@ -439,9 +430,7 @@ namespace ternary
         Word r { registers.get(reg) };
         if (type == hexad_select::full_word)
         {
-            memory.set(addr, r.low());
-            memory.set(addr+1, r.middle());
-            memory.set(addr+2, r.high());
+            memory.set_word(addr, r);
         }
         else
         {
@@ -485,20 +474,7 @@ namespace ternary
 
         if (type == hexad_select::full_word)
         {
-            // Temporary so we don't clobber address
-            auto temp { address };
-
-            memory.set(temp.value(), current.low().get());
-
-            temp = (add(temp, 1).first);
-            temp.set_high(0);
-
-            memory.set(temp.value(), current.middle().get());
-
-            temp = (add(temp, 1).first);
-            temp.set_high(0);
-
-            memory.set(temp.value(), current.high().get());
+            memory.set_word(address.value(), current);
         }
         else
         {
@@ -529,12 +505,49 @@ namespace ternary
     {
         auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
 
+        memory.set_word(address, registers.get(srcreg));
+
         if (flag_register.get_flag(flags::direction))
         {
             registers.set(srcreg, add(address, 3).first);
         }
 
-        // flag_register.set_flag(flags::sign, sign_c(current.value()));
+        flag_register.set_flag(flags::sign, sign_c(registers.get(srcreg).value()));
+    }
+
+    void Cpu::push_register(const int reg)
+    {
+        // rs = stack pointer
+        auto sp { registers.get(-6) };
+        auto data { registers.get(reg) };
+
+        memory.set_word(sp.value(), data);
+
+        auto newsp  { sub(sp, 3) };
+
+        // TODO: Handle stack overflow, probably using carry from the
+        // previous operation.
+        registers.set(-6, newsp.first);
+
+        flag_register.set_flag(flags::sign, sign_c(data.value()));
+    }
+
+    void Cpu::pop_register(const int reg)
+    {
+        // rs = stack pointer
+        auto sp { registers.get(-6) };
+
+        auto newsp  { add(sp, 3) };
+
+        // TODO: Handle stack overflow, probably using carry from the
+        // previous operation.
+        registers.set(-6, newsp.first);
+
+        auto data { memory.get_word(newsp.first.value()) };
+
+        registers.set(reg, data);
+
+        flag_register.set_flag(flags::sign, sign_c(data.value()));
     }
 
     void Cpu::branch_on_flag(const int addr, const int flag, const int target)
