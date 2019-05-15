@@ -72,6 +72,8 @@ namespace ternary
                 store_register_memory(op.m, op.low12(), hexad_select::full_word);
                 break;
             case -10:
+                decode_minor_indirect(op);
+                break;
             case -11:
                 store_register_memory(op.m, op.low12(), hexad_select::high);
                 break;
@@ -260,6 +262,28 @@ namespace ternary
                 break;
             case -4:
                 exchange_registers(op.y, op.z);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_indirect(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 5:
+                store_register_indirect(op.y, op.z, hexad_select::low);
+                break;
+            case 6:
+                store_register_indirect(op.y, op.z, hexad_select::middle);
+                break;
+            case 7:
+                store_register_indirect(op.y, op.z, hexad_select::high);
+                break;
+            case 9:
+                store_register_indirect(op.y, op.z, hexad_select::full_word);
                 break;
             default:
                 undefined_opcode(op);
