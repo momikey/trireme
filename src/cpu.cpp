@@ -7,6 +7,8 @@ namespace ternary
         switch (op.o)
         {
             case 0:
+                decode_minor_system(op);
+                break;
             case 1:
                 decode_minor_tritwise(op);
                 break;
@@ -86,6 +88,36 @@ namespace ternary
                 store_register_memory(op.m, op.low12(), hexad_select::low);
                 break;
 
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_system(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 0:
+                // %00.... is an *intentional* undefined opcode
+                undefined_opcode(op);
+                break;
+            case 1:
+                system_load_register(op.x, op.z);
+                break;
+            case 10:
+                system_call(op.low6());
+                break;
+            case -1:
+                system_store_register(op.x, op.z);
+            case -11:
+                // %0x.... is a NOP
+                break;
+            case -12:
+                system_breakpoint();
+                break;
+            case -13:
+                system_return();
             default:
                 undefined_opcode(op);
                 break;
@@ -974,5 +1006,74 @@ namespace ternary
 
         auto retaddr { memory.get_word(newsp.first.value()) };
         instruction_pointer.set(retaddr);
+    }
+
+    void Cpu::system_call(const int vec)
+    {
+        // rv = system call vector table
+        auto vbase { registers.get(-9) };
+        auto addr { add(vbase, vec*3).first };
+
+        // rr = return address (system calls are not reentrant)
+        registers.set(-5, instruction_pointer);
+
+        instruction_pointer.set(addr);
+    }
+
+    void Cpu::system_return()
+    {
+        instruction_pointer.set(registers.get(-5));
+    }
+
+    void Cpu::system_breakpoint()
+    {
+        if (flag_register.get_flag(flags::trap))
+        {
+            // TODO: Raise a #BK interrupt
+        }
+    }
+
+    void Cpu::system_load_register(const int userreg, const int sysreg)
+    {
+        if (sysreg > 0)
+        {
+            registers.set(userreg, control_regs.at(sysreg));
+        }
+        else if (sysreg < 0)
+        {
+            registers.set(userreg, debug_regs.at(sysreg));
+        }
+        else
+        {
+            registers.set(userreg, instruction_pointer);
+        }
+    }
+
+    void Cpu::system_store_register(const int userreg, const int sysreg)
+    {
+        if (sysreg < 0)
+        {
+            debug_regs.at(sysreg) = registers.get(userreg);
+        }
+        else if (flag_register.get_flag(flags::protection))
+        {
+            if (sysreg > 0)
+            {
+                control_regs.at(sysreg) = registers.get(userreg);
+            }
+            else if (flag_register.get_flag(flags::protection) == -1)
+            {
+                // P flag = -1 allows directly changing IP
+                instruction_pointer.set(registers.get(userreg));
+            }
+            else
+            {
+                // TODO Raise a #PV interrupt
+            }
+        }
+        else
+        {
+            // TOOD Raise a #PV interrupt
+        }
     }
 }

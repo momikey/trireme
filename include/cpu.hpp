@@ -58,7 +58,7 @@ namespace ternary
         Word instruction_pointer;
 
         // These are special, so handle them separately
-        std::array<Word, control_register_count> control_regs;
+        std::array<Word, control_register_count+1> control_regs;
         std::array<Word, debug_register_count> debug_regs;
 
         private:
@@ -144,6 +144,12 @@ namespace ternary
         void branch_ternary(flags f, const int preg, const int zreg, const int nreg);
         void branch_call(const int addr, bool relative);
         void branch_return();
+
+        void system_call(const int vec);
+        void system_return();
+        void system_breakpoint();
+        void system_load_register(const int userreg, const int sysreg);
+        void system_store_register(const int userreg, const int sysreg);
 
         void undefined_opcode(Opcode& op);
 
