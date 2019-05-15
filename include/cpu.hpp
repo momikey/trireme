@@ -38,6 +38,7 @@ namespace ternary
         Hexad get_memory(int address) const { return memory.get(address); }
         Word get_memory_word(int address) const
             { return { memory.get_word(address) }; }
+        Word get_instruction_pointer() const { return instruction_pointer; }
 
         void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
         void debug_set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
@@ -111,8 +112,6 @@ namespace ternary
         void push_register(const int reg);
         void pop_register(const int reg);
 
-        void branch_on_flag(const int addr, const int flag, const int target);
-
         void add_subtract_register(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
         void add_subtract_carry(const int srcreg1, const int srcreg2, const int destreg, const bool subtract);
         void add_subtract_immediate(const int srcreg, const int destreg, const int immediate, const bool subtract);
@@ -136,6 +135,15 @@ namespace ternary
         void set_register(const int reg, const int value);
         void move_register(const int srcreg, const int destreg);
         void exchange_registers(const int lreg, const int rreg);
+        void set_flag_to_value(flags f, const int target);
+
+        void branch_absolute(const int address);
+        void branch_register(const int reg, const int disp, bool subroutine);
+        void branch_relative(const int disp);
+        void branch_on_flag(const int addr, const int flag, const int target);
+        void branch_ternary(flags f, const int preg, const int zreg, const int nreg);
+        void branch_call(const int addr, bool relative);
+        void branch_return();
 
         void undefined_opcode(Opcode& op);
 

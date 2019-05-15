@@ -476,7 +476,7 @@ namespace ternary { namespace assembler {
     {};
 
     struct in_car :
-        TAO_PEGTL_KEYWORD("car");
+        TAO_PEGTL_KEYWORD("car")
     {};
     
     struct in_bpc :

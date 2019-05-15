@@ -36,6 +36,8 @@ namespace ternary
                 load_register_memory(op.m, op.low12(), hexad_select::full_word);
                 break;
             case 10:
+                decode_minor_branch(op);
+                break;
             case 11:
                 branch_on_flag(op.low12(), op.m, -1);
                 break;
@@ -262,6 +264,55 @@ namespace ternary
                 break;
             case -4:
                 exchange_registers(op.y, op.z);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_branch(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 0:
+                branch_call(op.low12(), false);
+                break;
+            case 1:
+                branch_relative(op.low12());
+                break;
+            case 2:
+                branch_register(op.x, op.low6(), false);
+                break;
+            case 3:
+                branch_register(op.x, 0, false);
+                break;
+            case 4:
+                branch_absolute(op.low12());
+                break;
+            case 11:
+                set_flag_to_value(static_cast<flags>(op.z), -1);
+            case 12:
+                set_flag_to_value(static_cast<flags>(op.z), 0);
+                break;
+            case 13:
+                set_flag_to_value(static_cast<flags>(op.z), 1);
+                break;
+            case -1:
+                branch_relative(op.low6());
+                break;
+            case -2:
+                // Note different order of operands!!!
+                branch_ternary(static_cast<flags>(op.t), op.z, op.y, op.x);
+                break;
+            case -3:
+                branch_register(op.z, 0, true);
+                break;
+            case -9:
+                branch_call(op.low12(), true);
+                break;
+            case -13:
+                branch_return();
                 break;
             default:
                 undefined_opcode(op);
@@ -578,7 +629,8 @@ namespace ternary
     {
         if (flag_register.get_flag(static_cast<flags>(flag)) == target)
         {
-            instruction_pointer = { addr };
+            auto newaddr { add(instruction_pointer, addr).first };
+            instruction_pointer.set(newaddr);
         }
     }
 
@@ -827,5 +879,100 @@ namespace ternary
         auto temp { registers.get(lreg) };
         registers.set(lreg, registers.get(rreg));
         registers.set(rreg, temp);
+    }
+
+    void Cpu::set_flag_to_value(flags f, const int target)
+    {
+        flag_register.set_flag(f, target);
+    }
+
+    void Cpu::branch_absolute(const int address)
+    {
+        instruction_pointer.set(address);
+    }
+
+    void Cpu::branch_register(const int reg, const int disp, bool subroutine)
+    {
+        if (subroutine)
+        {
+            // Save the previous address on the stack
+
+            // rs = stack pointer
+            auto sp { registers.get(-6) };
+
+            memory.set_word(sp.value(), instruction_pointer);
+
+            auto newsp  { sub(sp, 3) };
+
+            // TODO: Handle stack overflow, probably using carry from the
+            // previous operation.
+            registers.set(-6, newsp.first);
+        }
+
+        auto newaddr { add(registers.get(reg), disp).first };
+        instruction_pointer.set(newaddr);
+    }
+
+    void Cpu::branch_relative(const int disp)
+    {
+        auto newaddr { add(instruction_pointer, disp).first };
+        instruction_pointer.set(newaddr);
+    }
+
+    void Cpu::branch_ternary(flags f, const int preg, const int zreg, const int nreg)
+    {
+        auto addr { instruction_pointer };
+
+        switch (flag_register.get_flag(f))
+        {
+            case 1:
+                addr.set(add(addr, preg).first);
+                break;
+            case 0:
+                addr.set(add(addr, zreg).first);
+                break;
+            case -1:
+                addr.set(add(addr, nreg).first);
+                break;
+            default:
+                assert(0);
+                break;
+        }
+
+        instruction_pointer.set(addr);
+    }
+
+    void Cpu::branch_call(const int addr, bool relative)
+    {
+        auto newaddr { relative ? add(instruction_pointer, addr).first : addr };
+
+        // Save the previous address on the stack
+
+        // rs = stack pointer
+        auto sp { registers.get(-6) };
+
+        memory.set_word(sp.value(), instruction_pointer);
+
+        auto newsp  { sub(sp, 3) };
+
+        // TODO: Handle stack overflow, probably using carry from the
+        // previous operation.
+        registers.set(-6, newsp.first);
+
+        instruction_pointer.set(newaddr);
+    }
+
+    void Cpu::branch_return()
+    {
+        // Pop the stack to get the return address
+        auto sp { registers.get(-6) };
+        auto newsp { add(sp, 3) };
+
+        // TODO: Handle stack overflow, probably using carry from the
+        // previous operation.
+        registers.set(-6, newsp.first);
+
+        auto retaddr { memory.get_word(newsp.first.value()) };
+        instruction_pointer.set(retaddr);
     }
 }

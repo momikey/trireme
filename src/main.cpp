@@ -49,17 +49,30 @@ int main(int, char**) {
     Cpu cpu {};
 
     cpu.debug_set_register(-6, -3);
-    cpu.debug_set_register(1, 123456789);
+    cpu.debug_set_register(1, -777);
 
-    Opcode o1 { 8, 11, 0, 0, 0, 1 }; // psh rA
-    Opcode o2 { 8, 13, 0, 0, 0, 2 }; // pop rB
+    Opcode o1 { 10, 4, 1, 2, 3, 4 };    // bra %ABCD
+    Opcode o2 { 10, 2, 0, 1, 0, 0 };    // bri rA, 0
+    Opcode o3 { 10, -9, 0, 1, 2, -6};   // car +777
+    Opcode o4 { 10, -13, 0, 0, 0, 0};   // ret
 
     cpu.debug_decode_instruction(o1);
-    std::cout << cpu.get_register(-6) << '\n';
+    std::cout << cpu.get_instruction_pointer() << '\n';
     cpu.debug_print_flags();
 
     cpu.debug_decode_instruction(o2);
-    std::cout << cpu.get_register(2) << '\n';
+    std::cout << cpu.get_instruction_pointer() << '\n';
+    cpu.debug_print_flags();
+
+    cpu.debug_decode_instruction(o3);
+    std::cout << cpu.get_instruction_pointer() << '\n';
     std::cout << cpu.get_register(-6) << '\n';
+    std::cout << cpu.get_memory_word(-3) << '\n';
+    cpu.debug_print_flags();
+
+    cpu.debug_decode_instruction(o4);
+    std::cout << cpu.get_instruction_pointer() << '\n';
+    std::cout << cpu.get_register(-6) << '\n';
+    std::cout << cpu.get_memory_word(-3) << '\n';
     cpu.debug_print_flags();
 }
