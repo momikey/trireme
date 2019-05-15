@@ -474,6 +474,10 @@ namespace ternary { namespace assembler {
     struct in_cal :
         TAO_PEGTL_KEYWORD("cal")
     {};
+
+    struct in_car :
+        TAO_PEGTL_KEYWORD("car");
+    {};
     
     struct in_bpc :
         TAO_PEGTL_KEYWORD("bpc")
@@ -984,7 +988,8 @@ namespace ternary { namespace assembler {
                 in_bnb,
                 in_bnt,
                 in_bni,
-                in_bnp
+                in_bnp,
+                in_car
             >,
             star< blank >,
             memory_offset_12

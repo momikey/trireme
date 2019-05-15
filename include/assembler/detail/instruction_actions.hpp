@@ -1448,6 +1448,19 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_car>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // CAR mem +0+ -00
+            s.o = 10;
+            s.m = -9;
+            s.op = "car";
+        }
+    };
+
+    template<>
     struct action<in_bpc>
     {
         template<typename Input, typename State>
