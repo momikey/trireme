@@ -72,6 +72,8 @@ namespace ternary
                 undefined_opcode(op);
                 break;
             case -8:
+                decode_minor_io(op);
+                break;
             case -9:
                 store_register_memory(op.m, op.low12(), hexad_select::full_word);
                 break;
@@ -386,6 +388,28 @@ namespace ternary
                 break;
             case -1:
                 set_register(op.y, -1);
+                break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_io(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 1:
+                io_read(op.t, op.low9(), false);
+                break;
+            case 2:
+                io_write(op.t, op.low9(), true);
+                break;
+            case 4:
+                io_read(op.t, op.low9(), true);
+                break;
+            case -1:
+                io_write(op.t, op.low9(), false);
                 break;
             default:
                 undefined_opcode(op);
@@ -1074,6 +1098,36 @@ namespace ternary
         else
         {
             // TOOD Raise a #PV interrupt
+        }
+    }
+
+    void Cpu::io_read(const int reg, const int port, bool binary)
+    {
+        Word data { binary ? io.read_binary(port) : io.read(port) };
+
+        if (binary)
+        {
+            registers.set(reg, bin(data));
+        }
+        else
+        {
+            registers.set(reg, data);
+        }
+
+        flag_register.set_flag(flags::sign, sign_c(data.value()));
+    }
+
+    void Cpu::io_write(const int reg, const int port, bool binary)
+    {
+        Word data { binary ? tri(registers.get(reg)) : registers.get(reg) };
+
+        if (binary)
+        {
+            io.write_binary(port, data);
+        }
+        else
+        {
+            io.write(port, data);
         }
     }
 }

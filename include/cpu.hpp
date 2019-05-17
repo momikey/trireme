@@ -151,6 +151,9 @@ namespace ternary
         void system_load_register(const int userreg, const int sysreg);
         void system_store_register(const int userreg, const int sysreg);
 
+        void io_read(const int reg, const int port, bool binary);
+        void io_write(const int reg, const int port, bool binary);
+
         void undefined_opcode(Opcode& op);
 
         // Helpers to construct values from 3-trit "triads"
