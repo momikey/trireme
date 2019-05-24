@@ -12,6 +12,7 @@
 #include "io.hpp"
 #include "flags.hpp"
 #include "opcode.hpp"
+#include "debug_io.hpp"
 
 #include "word.hpp"
 #include "hexad.hpp"
@@ -32,7 +33,7 @@ namespace ternary
     {
         public:
 
-        Cpu() = default;
+        Cpu();
 
         Word get_register(int reg) const { return registers.get(reg); }
         Hexad get_memory(int address) const { return memory.get(address); }
@@ -55,6 +56,7 @@ namespace ternary
         BasicMemory memory;
         FlagRegister flag_register;
         Io io;
+        DebugIo debug_io;
         Word instruction_pointer;
 
         // These are special, so handle them separately
@@ -64,6 +66,8 @@ namespace ternary
         private:
         using unary_function = std::function<Word(const Word&)>;
         using binary_function = std::function<Word(const Word&, const Word&)>;
+
+        static constexpr auto debug_io_base = 243;
 
         // Internal methods begin here
 

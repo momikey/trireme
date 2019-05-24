@@ -48,31 +48,22 @@ int main(int, char**) {
 
     Cpu cpu {};
 
-    cpu.debug_set_register(-6, -3);
-    cpu.debug_set_register(1, -777);
+    cpu.debug_set_register(1, 'x');
+    cpu.debug_set_register(2, 0);
+    cpu.debug_set_register(3, 1);
 
-    Opcode o1 { 10, 4, 1, 2, 3, 4 };    // bra %ABCD
-    Opcode o2 { 10, 2, 0, 1, 0, 0 };    // bri rA, 0
-    Opcode o3 { 10, -9, 0, 1, 2, -6};   // car +777
-    Opcode o4 { 10, -13, 0, 0, 0, 0};   // ret
+    Opcode opcodes[] {
+        { -8, -1, 3, 0, 9,  0 },    // out rC, @%I0
+        { -8,  1, 1, 0, 9, -1 },    // int @%In, rA
+        { -8, -1, 1, 0, 9, -2 },    // out rA, @%Io
+        { -8, -1, 2, 0, 9, -2 },    // out rB, @%Io
+    };
 
-    cpu.debug_decode_instruction(o1);
-    std::cout << cpu.get_instruction_pointer() << '\n';
-    cpu.debug_print_flags();
+    for (auto& o : opcodes)
+    {
+        cpu.debug_decode_instruction(o);
+        std::cout << cpu.get_instruction_pointer() << '\n';
+        cpu.debug_print_flags();
+    }
 
-    cpu.debug_decode_instruction(o2);
-    std::cout << cpu.get_instruction_pointer() << '\n';
-    cpu.debug_print_flags();
-
-    cpu.debug_decode_instruction(o3);
-    std::cout << cpu.get_instruction_pointer() << '\n';
-    std::cout << cpu.get_register(-6) << '\n';
-    std::cout << cpu.get_memory_word(-3) << '\n';
-    cpu.debug_print_flags();
-
-    cpu.debug_decode_instruction(o4);
-    std::cout << cpu.get_instruction_pointer() << '\n';
-    std::cout << cpu.get_register(-6) << '\n';
-    std::cout << cpu.get_memory_word(-3) << '\n';
-    cpu.debug_print_flags();
 }

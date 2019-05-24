@@ -2,6 +2,23 @@
 
 namespace ternary
 {
+    Cpu::Cpu()
+    {
+        using std::placeholders::_1;
+
+        Io::read_handler_t read { std::bind(&DebugIo::read, &debug_io) };
+        Io::write_handler_t write { std::bind(&DebugIo::write, &debug_io, _1) };
+        
+        Io::read_handler_t read_control { std::bind(&DebugIo::read_control, &debug_io) };
+        Io::write_handler_t write_control { std::bind(&DebugIo::write_control, &debug_io, _1) };
+
+        io.bind(debug_io_base - 2, write);
+        io.bind(debug_io_base - 1, read);
+
+        io.bind(debug_io_base, read_control);
+        io.bind(debug_io_base, write_control);
+    }
+
     void Cpu::decode_major(Opcode& op)
     {
         switch (op.o)
@@ -1123,7 +1140,7 @@ namespace ternary
 
         if (binary)
         {
-            io.write_binary(port, data);
+            io.write_binary(port, static_cast<unsigned char>(data.value()));
         }
         else
         {

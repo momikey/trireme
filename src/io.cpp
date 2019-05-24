@@ -5,7 +5,7 @@
 
 namespace ternary
 {
-    Word Io::read(int addresss)
+    Word Io::read(int address)
     {
         if (read_handlers[address])
         {
@@ -38,7 +38,7 @@ namespace ternary
         }
         else
         {
-            return io_space[address];
+            return io_space[address].value();
         }
     }
 
@@ -50,6 +50,46 @@ namespace ternary
         else
         {
             io_space[address] = data;
+        }
+    }
+
+    bool Io::bind(int port, read_handler_t reader)
+    {
+        if (read_handlers[port])
+        {
+            return false;
+        }
+        else
+        {
+            read_handlers[port] = reader;
+            return true;
+        }
+    }
+
+    bool Io::bind(int port, write_handler_t writer)
+    {
+        if (write_handlers[port])
+        {
+            return false;
+        }
+        else
+        {
+            write_handlers[port] = writer;
+            return true;
+        }
+    }
+
+    void Io::unbind(int port, RW which)
+    {
+        switch (which)
+        {
+            case RW::read:
+                read_handlers.erase(port);
+                break;
+
+            case RW::write:
+                write_handlers.erase(port);
+                break;
         }
     }
 }

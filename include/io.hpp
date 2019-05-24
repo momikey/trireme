@@ -10,6 +10,12 @@
 
 namespace ternary
 {
+    enum class RW
+    {
+        read,
+        write
+    };
+
     struct Io
     {
         // I/O handlers 
@@ -21,7 +27,10 @@ namespace ternary
         public:
         Io() = default;
 
-        // TODO: Implement a kind of binding system here.
+        bool bind(int port, read_handler_t reader);
+        bool bind(int port, write_handler_t writer);
+        void unbind(int port, RW which);
+
         Word read(int address);
         Word read(Word address) { return read(address.value()); }
         int read_binary(int address);

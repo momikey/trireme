@@ -22,6 +22,7 @@ set(TRIREME_INCLUDES
     include/flags.hpp
     include/cpu.hpp
     include/io.hpp
+    include/debug_io.hpp
 )
 
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
@@ -34,6 +35,8 @@ set(TRIREME_SOURCES
     src/opcode.cpp
     src/flags.cpp
     src/cpu.cpp
+    src/io.cpp
+    src/debug_io.cpp
 )
 
 set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUDES})
