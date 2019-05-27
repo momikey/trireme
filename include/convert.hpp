@@ -89,4 +89,20 @@ inline char trit_to_character(const Int trit) noexcept
     }
 }
 
+template<typename Int = unsigned int>
+inline Int binary_to_ternary(Int n) noexcept
+{
+    Int total { 0 };
+
+    for (Int pw = 1; n != 0; n >>= 1, pw *= 3)
+    {
+        if (n & 1)
+        {
+            total += pw;
+        }
+    }
+
+    return total;
+}
+
 #endif /* TRIREME_CONVERT_HPP */

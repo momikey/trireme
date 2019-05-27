@@ -43,6 +43,21 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct directive_db :
+        seq<
+            TAO_PEGTL_KEYWORD("db"),
+            star< blank >,
+            list<
+                sor<
+                    constant_value,
+                    reference
+                >,
+                one< ',' >,
+                blank
+            >
+        >
+    {};
+
     struct directive_dw :
         seq<
             TAO_PEGTL_KEYWORD("dw"),
@@ -78,6 +93,7 @@ namespace ternary { namespace assembler {
             directive_eq,
             directive_ad,
             directive_dh,
+            directive_db,
             directive_dw,
             directive_zh,
             directive_zw

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <cstdint>
 
 #include "convert.hpp"
 #include "ternary_math.hpp"
@@ -59,11 +60,17 @@ int main(int, char**) {
         { -8, -1, 2, 0, 9, -2 },    // out rB, @%Io
     };
 
-    for (auto& o : opcodes)
-    {
-        cpu.debug_decode_instruction(o);
-        std::cout << cpu.get_instruction_pointer() << '\n';
-        cpu.debug_print_flags();
-    }
+    // for (auto& o : opcodes)
+    // {
+    //     cpu.debug_decode_instruction(o);
+    //     std::cout << cpu.get_instruction_pointer() << '\n';
+    //     cpu.debug_print_flags();
+    // }
 
+    auto data { as.assemble_file(sample_filename) };
+    
+    for (auto& d : data)
+    {
+        std::cout << d.first << '\t' << d.second << '\n';
+    }
 }

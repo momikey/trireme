@@ -232,6 +232,30 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<directive_db>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // DB is the same as DW, but for bytes. This means we
+            // have to convert the number into a kind of ternary-packed
+            // binary format.
+            while (!s.operands.empty())
+            {
+                auto value { s.operands.front() };
+                Word word { binary_to_ternary(value >= 0 ? value : value + (1 << 8)) };
+
+                s.operands.pop();
+
+                // Words are stored little-endian
+                s.data[s.instruction_pointer++] = word.low();
+                s.data[s.instruction_pointer++] = word.middle();
+                s.data[s.instruction_pointer++] = word.high();
+            }
+        }
+    };
+
+    template<>
     struct action<directive_zh>
     {
         template<typename Input, typename State>
