@@ -73,6 +73,14 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct directive_ds :
+        seq<
+            TAO_PEGTL_KEYWORD("ds"),
+            star< blank >,
+            string_literal
+        >
+    {};
+
     struct directive_zh :
         seq<
             TAO_PEGTL_KEYWORD("zh"),
@@ -95,6 +103,7 @@ namespace ternary { namespace assembler {
             directive_dh,
             directive_db,
             directive_dw,
+            directive_ds,
             directive_zh,
             directive_zw
         >

@@ -3,6 +3,7 @@
 
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/integer.hpp>
+#include <tao/pegtl/contrib/unescape.hpp>
 
 namespace ternary { namespace assembler {
     using namespace tao::pegtl;
@@ -59,6 +60,62 @@ namespace ternary { namespace assembler {
         sor<
             integer,
             balanced_notation
+        >
+    {};
+
+    // Strings, with unescaping
+
+    // An escaped character, as per C
+    struct escaped_c :
+        one<
+            '\'',
+            '"',
+            '\\',
+            'a',
+            'b',
+            'f',
+            'n',
+            'r',
+            't',
+            'v'
+        >
+    {};
+
+    // An escaped hex digit (mostly for completeness)
+    struct escaped_x :
+        seq<
+            one< 'x' >,
+            rep<
+                2,
+                must<
+                    xdigit
+                >
+            >
+        >
+    {};
+
+    struct escaped :
+        sor<
+            escaped_x,
+            escaped_c
+        >
+    {};
+
+    struct character :
+        if_must_else<
+            one< '\\' >,
+            escaped,
+            ascii::print
+        >
+    {};
+
+    struct string_literal :
+        if_must<
+            one< '"' >,
+            until<
+                one< '"' >,
+                character
+            >
         >
     {};
 

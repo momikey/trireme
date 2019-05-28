@@ -36,6 +36,31 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<escaped_x> : unescape::unescape_x {};
+
+    template<>
+    struct action<escaped_c> : unescape::unescape_c<
+        escaped_c,
+        '\'', '"', '\\', '\a', '\b', '\f', '\n', '\r', '\t', '\v'
+    > {}; //" (to fix syntax highlighting)
+
+    template<>
+    struct action<ascii::print> : unescape::append_all {};
+
+    template<>
+    struct action<string_literal>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            for (auto& c : s.unescaped)
+            {
+                s.data[s.instruction_pointer++] = c;
+            }
+        }
+    };
+
+    template<>
     struct action<immediate_6>
     {
         template<typename Input, typename State>
@@ -352,12 +377,12 @@ namespace ternary { namespace assembler {
         template<typename Input, typename State>
         static void apply(const Input& in, State& s)
         {
-            if (s.instruction_pointer % 3)
+            if (lowest_trit(s.instruction_pointer) != -1)
             {
                 // Instructions must be word-aligned.
                 // We fix that here, although it may mess up
                 // insert directives.
-                s.instruction_pointer += 3 - (s.instruction_pointer % 3);
+                s.instruction_pointer += 2 - lowest_trit(s.instruction_pointer);
             }
         }
     };

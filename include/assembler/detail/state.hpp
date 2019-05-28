@@ -11,7 +11,6 @@ namespace ternary { namespace assembler {
 
     struct state
     {
-        int converted;
         int o,m,t,x,y,z;
         std::string op;
         int instruction_pointer;
@@ -21,8 +20,11 @@ namespace ternary { namespace assembler {
         std::string working_symbol;
 
         std::map<int, Hexad> data {};
-    };
 
+        // These are PEGTL internal
+        int converted;
+        std::string unescaped;
+    };
 }}
 
 #endif /* TRIREME_ASSEMBLER_STATE_HPP */
