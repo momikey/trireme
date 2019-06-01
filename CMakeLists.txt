@@ -23,6 +23,7 @@ set(TRIREME_INCLUDES
     include/cpu.hpp
     include/io.hpp
     include/debug_io.hpp
+    include/exceptions.hpp
 )
 
 set(TRIREME_IMPL_INCLUDES include/detail/convert_impl.hpp)
