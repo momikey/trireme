@@ -13,6 +13,7 @@
 #include "flags.hpp"
 #include "opcode.hpp"
 #include "debug_io.hpp"
+#include "exceptions.hpp"
 
 #include "word.hpp"
 #include "hexad.hpp"
@@ -165,6 +166,17 @@ namespace ternary
         int value_9(int x, int y, int z) { return x * pow3(6) + y * pow3(3) + z; }
         int value_12(int x, int y, int z, int w) { return x + pow3(9) + y * pow3(6) + z * pow3(3) + w; }
 
+        // Memory read/write to handle absolute vs. pointer-based
+        Hexad read_memory(const int ad);
+        Word read_memory_word(const int ad);
+        void write_memory(const int ad, const int val);
+        void write_memory_word(const int ad, const int val);
+
+        Hexad read_memory(const Word& ad) { return read_memory(ad.value()); }
+        Word read_memory_word(const Word& ad) { return read_memory_word(ad.value()); }
+        void write_memory(const Word& ad, const int val) { return write_memory(ad.value(), val); }
+        void write_memory(const Word& ad, const Hexad& val) { return write_memory(ad.value(), val.get()); }
+        void write_memory_word(const Word& ad, const Word& val) { return write_memory_word(ad.value(), val.value()); }
     };
 }
 

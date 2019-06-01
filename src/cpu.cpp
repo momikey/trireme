@@ -19,6 +19,74 @@ namespace ternary
         io.bind(debug_io_base, write_control);
     }
 
+    Hexad Cpu::read_memory(const int ad)
+    {
+        auto f { flag_register.get_flag(flags::absolute) };
+
+        switch (f)
+        {
+            case 0:
+                return memory.get(ad);
+            
+            case 1:
+                return memory.get(ad + registers.get(-3).value());
+            
+            default:
+                throw invalid_flag{};
+        }
+    }
+
+    Word Cpu::read_memory_word(const int ad)
+    {
+        auto f { flag_register.get_flag(flags::absolute) };
+
+        switch (f)
+        {
+            case 0:
+                return memory.get_word(ad);
+            
+            case 1:
+                return memory.get_word(ad + registers.get(-3).value());
+            
+            default:
+                throw invalid_flag{};
+        }
+    }
+
+    void Cpu::write_memory(const int ad, const int val)
+    {
+        auto f { flag_register.get_flag(flags::absolute) };
+
+        switch (f)
+        {
+            case 0:
+                return memory.set(ad, val);
+            
+            case 1:
+                return memory.set(ad + registers.get(-3).value(), val);
+            
+            default:
+                throw invalid_flag{};
+        }
+    }
+
+    void Cpu::write_memory_word(const int ad, const int val)
+    {
+        auto f { flag_register.get_flag(flags::absolute) };
+
+        switch (f)
+        {
+            case 0:
+                return memory.set_word(ad, val);
+            
+            case 1:
+                return memory.set_word(ad + registers.get(-3).value(), val);
+            
+            default:
+                throw invalid_flag{};
+        }
+    }
+
     void Cpu::decode_major(Opcode& op)
     {
         switch (op.o)
@@ -479,14 +547,14 @@ namespace ternary
     {
         if (type == hexad_select::full_word)
         {
-            Word w { memory.get_word(addr) };
+            Word w { read_memory_word(addr) };
             registers.set(reg, w);
 
             flag_register.set_flag(flags::sign, sign_c(w.value()));
         }
         else
         {
-            Hexad h { memory.get(addr) };
+            Hexad h { read_memory(addr) };
             Word current { registers.get(reg) };
 
             switch (type)
@@ -531,11 +599,11 @@ namespace ternary
 
         if (type == hexad_select::full_word)
         {
-            current.set(memory.get_word(address.value()));
+            current.set(read_memory_word(address.value()));
         }
         else
         {
-            auto data { memory.get(address.value()) };
+            auto data { read_memory(address.value()) };
 
             switch (type)
             {
@@ -563,7 +631,7 @@ namespace ternary
     {
         auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
 
-        registers.set(destreg, memory.get_word(address));
+        registers.set(destreg, read_memory_word(address));
         
         if (flag_register.get_flag(flags::direction))
         {
@@ -578,22 +646,22 @@ namespace ternary
         Word r { registers.get(reg) };
         if (type == hexad_select::full_word)
         {
-            memory.set_word(addr, r);
+            write_memory_word(addr, r);
         }
         else
         {
             switch (type)
             {
                  case hexad_select::low:
-                    memory.set(addr, r.low());
+                    write_memory(addr, r.low());
                     break;
 
                 case hexad_select::middle:
-                    memory.set(addr, r.middle());
+                    write_memory(addr, r.middle());
                     break;
                 
                 case hexad_select::high:
-                    memory.set(addr, r.high());
+                    write_memory(addr, r.high());
                     break;
             
                 default:
@@ -622,22 +690,22 @@ namespace ternary
 
         if (type == hexad_select::full_word)
         {
-            memory.set_word(address.value(), current);
+            write_memory_word(address.value(), current);
         }
         else
         {
             switch (type)
             {
                  case hexad_select::low:
-                    memory.set(address.value(), current.low().get());
+                    write_memory(address.value(), current.low().get());
                     break;
 
                 case hexad_select::middle:
-                    memory.set(address.value(), current.middle().get());
+                    write_memory(address.value(), current.middle().get());
                     break;
                 
                 case hexad_select::high:
-                    memory.set(address.value(), current.high().get());
+                    write_memory(address.value(), current.high().get());
                     break;
             
                 default:
@@ -653,7 +721,7 @@ namespace ternary
     {
         auto address { registers.get(-3).value() + registers.get(-1).value() + addr };
 
-        memory.set_word(address, registers.get(srcreg));
+        write_memory_word(address, registers.get(srcreg));
 
         if (flag_register.get_flag(flags::direction))
         {
