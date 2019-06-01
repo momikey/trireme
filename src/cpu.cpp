@@ -504,8 +504,7 @@ namespace ternary
 
     void Cpu::undefined_opcode(Opcode& op)
     {
-        // TODO: Trap and issue a simulated CPU interrupt
-        std::cerr << "Undefined operation " << op.value.value_string() << '\n';
+        throw invalid_opcode{};
     }
 
     void Cpu::load_register_immediate(const int reg, const int value, hexad_select type)
@@ -876,7 +875,7 @@ namespace ternary
         }
         else
         {
-            // Divide by zero
+            throw divide_by_zero{};
         }
         
     }
@@ -913,7 +912,7 @@ namespace ternary
         }
         else
         {
-            // Divide by zero
+            throw divide_by_zero{};
         }        
     }
 
@@ -1138,7 +1137,7 @@ namespace ternary
     {
         if (flag_register.get_flag(flags::trap))
         {
-            // TODO: Raise a #BK interrupt
+            throw debug_breakpoint{};
         }
     }
 
@@ -1177,12 +1176,12 @@ namespace ternary
             }
             else
             {
-                // TODO Raise a #PV interrupt
+                throw protection_violation{};
             }
         }
         else
         {
-            // TOOD Raise a #PV interrupt
+            throw protection_violation{};
         }
     }
 

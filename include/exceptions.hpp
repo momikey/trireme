@@ -26,6 +26,7 @@ namespace ternary
     using debug_breakpoint = system_interrupt<1>;
     using protection_violation = system_interrupt<2>;
     using invalid_flag = system_interrupt<3>;
+    using invalid_opcode = system_interrupt<4>;
 }
 
 #endif /* TRIREME_EXCEPTIONS_HPP */

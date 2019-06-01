@@ -54,23 +54,22 @@ int main(int, char**) {
     cpu.debug_set_register(3, 1);
 
     Opcode opcodes[] {
-        { -8, -1, 3, 0, 9,  0 },    // out rC, @%I0
-        { -8,  1, 1, 0, 9, -1 },    // int @%In, rA
-        { -8, -1, 1, 0, 9, -2 },    // out rA, @%Io
-        { -8, -1, 2, 0, 9, -2 },    // out rB, @%Io
+        { 8, 0, 0, 1, 0, 0 },   // ldi 0, rA
+        { 8, 0, 0, 2, 4, 4 },   // ldi %DD, rB
+        { 0, 0, 0, 0, 0, 0 }    // und
     };
 
-    // for (auto& o : opcodes)
-    // {
-    //     cpu.debug_decode_instruction(o);
-    //     std::cout << cpu.get_instruction_pointer() << '\n';
-    //     cpu.debug_print_flags();
-    // }
-
-    auto data { as.assemble_file(sample_filename) };
-    
-    for (auto& d : data)
+    for (auto& o : opcodes)
     {
-        std::cout << d.first << '\t' << d.second << '\n';
+        cpu.debug_decode_instruction(o);
+        std::cout << cpu.get_instruction_pointer() << '\n';
+        cpu.debug_print_flags();
     }
+
+    // auto data { as.assemble_file(sample_filename) };
+    
+    // for (auto& d : data)
+    // {
+    //     std::cout << d.first << '\t' << d.second << '\n';
+    // }
 }
