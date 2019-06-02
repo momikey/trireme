@@ -59,11 +59,18 @@ int main(int, char**) {
         { 0, 0, 0, 0, 0, 0 }    // und
     };
 
-    for (auto& o : opcodes)
+    try
     {
-        cpu.debug_decode_instruction(o);
-        std::cout << cpu.get_instruction_pointer() << '\n';
-        cpu.debug_print_flags();
+        for (auto& o : opcodes)
+        {
+            cpu.debug_decode_instruction(o);
+            std::cout << cpu.get_instruction_pointer() << '\n';
+            cpu.debug_print_flags();
+        }
+    }
+    catch (const ternary::system_interrupt_base& e)
+    {
+        std::cerr << e.value() << '\n';
     }
 
     // auto data { as.assemble_file(sample_filename) };
