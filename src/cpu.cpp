@@ -19,6 +19,36 @@ namespace ternary
         io.bind(debug_io_base, write_control);
     }
 
+    /**
+     * @brief Reset the simulation to the "boot" state. This does not clear memory,
+     * but it does set all registers to their initial values.
+     */
+    void Cpu::reset()
+    {
+        registers.clear_all();
+        std::fill(control_regs.begin(), control_regs.end(), 0);
+        std::fill(debug_regs.begin(), debug_regs.end(), 0);
+        flag_register = {};
+
+        instruction_pointer.set(0, Hexad::min_value, Hexad::min_value);
+        control_regs[2].set(0, -279, -1);
+        registers.set(-9, { 0, -283, -364});
+    }
+
+    /**
+     * @brief Load data from a map of address/value pairs. This doesn't do
+     * much in the way of error-handling yet.
+     * 
+     * @param data A structure mapping addresses to hexad values
+     */
+    void Cpu::load(std::map<int, Hexad> data)
+    {
+        for (auto& pair : data)
+        {
+            memory.set(pair.first, pair.second);
+        }
+    }
+
     Hexad Cpu::read_memory(const int ad)
     {
         auto f { flag_register.get_flag(flags::absolute) };
@@ -1143,9 +1173,19 @@ namespace ternary
 
     void Cpu::system_load_register(const int userreg, const int sysreg)
     {
+        // The instruction pointer and flags register are aliased as CR0 and CR1,
+        // so we have to handle them with a bit of special casing.
+
         if (sysreg > 0)
         {
-            registers.set(userreg, control_regs.at(sysreg));
+            if (sysreg == 1)
+            {
+                registers.set(userreg, flag_register.get());
+            }
+            else
+            {
+                registers.set(userreg, control_regs.at(sysreg));
+            }            
         }
         else if (sysreg < 0)
         {
@@ -1159,6 +1199,9 @@ namespace ternary
 
     void Cpu::system_store_register(const int userreg, const int sysreg)
     {
+        // The instruction pointer and flags register are aliased as CR0 and CR1,
+        // so we have to handle them with a bit of special casing.
+
         if (sysreg < 0)
         {
             debug_regs.at(sysreg) = registers.get(userreg);
@@ -1167,7 +1210,19 @@ namespace ternary
         {
             if (sysreg > 0)
             {
-                control_regs.at(sysreg) = registers.get(userreg);
+                if (sysreg == 1)
+                {
+                    const auto valid_flags = {0, 1, 2, 5, 6, 7, 8};
+
+                    for (auto f : valid_flags)
+                    {
+                        flag_register.set_flag(flags(f), nth_trit(registers.get(userreg).value(), f));
+                    }
+                }
+                else
+                {
+                    control_regs.at(sysreg) = registers.get(userreg);
+                }                
             }
             else if (flag_register.get_flag(flags::protection) == -1)
             {

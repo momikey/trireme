@@ -2,6 +2,7 @@
 #define TRIREME_REGISTERS_HPP
 
 #include <array>
+#include <algorithm>
 
 #include "hexad.hpp"
 #include "word.hpp"
@@ -24,6 +25,7 @@ namespace ternary
 
         Word get(int r) const noexcept;
         void set(int r, const Word& w) noexcept;
+        void clear_all() noexcept;
 
         int clamp_address(int r) const noexcept { return clamp<int, address_width>(r); }
 

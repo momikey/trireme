@@ -48,6 +48,7 @@ int main(int, char**) {
     ternary::assembler::Assembler as {};
 
     Cpu cpu {};
+    cpu.reset();
 
     cpu.debug_set_register(1, 'x');
     cpu.debug_set_register(2, 0);

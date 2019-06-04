@@ -48,4 +48,14 @@ namespace ternary
             special[clamp_address(r)] = w.value();
         }
     }
+
+    /**
+     * @brief Clear all registers to 0.
+     * 
+     */
+    void Registers::clear_all() noexcept
+    {
+        std::fill(general.begin(), general.end(), 0);
+        std::fill(special.begin(), special.end(), 0);
+    }
 }

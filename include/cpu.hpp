@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cassert>
 #include <functional>
+#include <algorithm>
+#include <map>
 
 #include "registers.hpp"
 #include "memory.hpp"
@@ -36,12 +38,21 @@ namespace ternary
 
         Cpu();
 
+        // General "control" methods
+
+        void reset();
+        void load(std::map<int, Hexad> data);
+
+        // Getters for various parts of the simulator
+
         Word get_register(int reg) const { return registers.get(reg); }
         Hexad get_memory(int address) const { return memory.get(address); }
         Word get_memory_word(int address) const
             { return { memory.get_word(address) }; }
         Word get_instruction_pointer() const { return instruction_pointer; }
 
+        // Methods for debugging - these give direct access to memory, registers, etc.
+        
         void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
         void debug_set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
         void debug_decode_instruction(Opcode& op) { decode_major(op); }
@@ -61,6 +72,7 @@ namespace ternary
         Word instruction_pointer;
 
         // These are special, so handle them separately
+
         std::array<Word, control_register_count+1> control_regs;
         std::array<Word, debug_register_count> debug_regs;
 
