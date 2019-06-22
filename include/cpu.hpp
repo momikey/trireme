@@ -42,6 +42,8 @@ namespace ternary
 
         void reset();
         void load(std::map<int, Hexad> data);
+        void run();
+        void step();
 
         // Getters for various parts of the simulator
 

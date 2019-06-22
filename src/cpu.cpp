@@ -49,6 +49,76 @@ namespace ternary
         }
     }
 
+    /**
+     * @brief Start the simulated CPU. This begins execution at
+     * address %00zzzz and runs until an unhandled exception or
+     * a special debug I/O write.
+     * 
+     */
+    void Cpu::run()
+    {
+        // TODO
+    }
+
+    /**
+     * @brief Execute a single instruction on the simulated CPI.
+     * 
+     */
+    void Cpu::step()
+    {
+        // TODO
+        auto current_ip { instruction_pointer };
+
+        // We wrap the main fetch/decode loop in a try/catch
+        // for easier handling of interrupts (since we represent
+        // them as exceptions.)
+        try
+        {
+            Opcode instruction { memory.get_word(current_ip.value()) };
+            decode_major(instruction);
+            
+            // If debug breakpoints are enabled, check to see whether we
+            // have reached one. If so, raise the interrupt.
+            if (flag_register.get_flag(flags::trap) &&
+                std::find(debug_regs.cbegin(), debug_regs.cend(), current_ip) != debug_regs.cend()
+            )
+            {
+                throw debug_breakpoint{};
+            }
+        }
+        catch (const system_interrupt_base& e)
+        {
+            // Architecture interrupts are all derived from the
+            // `system_interrupt_base` class, and they all have
+            // a `value()` method that gives their interrupt #.
+            
+            // The hardware interrupt vector table is stored in
+            // the CR2 register. We take the interrupt # as an
+            // index into this table.
+            Word interrupt_address { add(control_regs[2], e.value()).first };
+            
+            // Save the current IP into CR3
+            control_regs[3].set(instruction_pointer);
+
+            // Now jump to the interrupt handler
+            instruction_pointer.set(interrupt_address);
+        }
+        catch (const std::exception& e)
+        {
+            // Other exceptions are, well, exceptional
+            std::cerr << e.what() << '\n';
+            throw;
+        }
+        
+        // Branch, call, return, and syscall/sysret will all change IP.
+        // If they don't, then we increment it by 3 (instructions are
+        // word-aligned on our architecture.)
+        if (instruction_pointer.value() == current_ip.value())
+        {
+            instruction_pointer.set(add(current_ip.value(), 3).first);
+        }
+    }
+
     Hexad Cpu::read_memory(const int ad)
     {
         auto f { flag_register.get_flag(flags::absolute) };
@@ -1072,7 +1142,7 @@ namespace ternary
 
             memory.set_word(sp.value(), instruction_pointer);
 
-            auto newsp  { sub(sp, 3) };
+            auto newsp { sub(sp, 3) };
 
             // TODO: Handle stack overflow, probably using carry from the
             // previous operation.
