@@ -80,6 +80,11 @@ namespace ternary
     // Shift and rotate operations can produce a carry, the same as addition
     using shift_result = std::pair<Word, int>;
 
+    // Equality operator (we use a naive comparison for now;
+    // if that becomes a problem, we can always change it to
+    // something more optimized)
+    inline bool operator==(const Word& lhs, const Word& rhs) { return lhs.value() == rhs.value(); }
+
     // Arithmetic
     addition_result add(const Word& lhs, Word rhs) noexcept;
     addition_result add(const Word& lhs, Word::value_type rhs) noexcept;
