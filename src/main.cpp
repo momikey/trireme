@@ -14,6 +14,8 @@
 #include "assembler/assembler.hpp"
 #include "assembler/detail/state.hpp"
 
+#include <fmt/core.h>
+
 using namespace ternary;
 
 template<typename T, std::size_t N>
@@ -23,16 +25,6 @@ void print_array(const std::array<T,N>& arr)
     {
         std::cout << v << ',';
     }
-}
-
-std::ostream& operator<<(std::ostream& os, Hexad h)
-{
-    return os << "H" << h.get();
-}
-
-std::ostream& operator<<(std::ostream& os, Word w)
-{
-    return os << w.value_string();
 }
 
 template<typename T, typename U>
@@ -65,7 +57,8 @@ int main(int, char**) {
         for (auto& o : opcodes)
         {
             cpu.debug_decode_instruction(o);
-            std::cout << cpu.get_instruction_pointer() << '\n';
+            // std::cout << cpu.get_instruction_pointer() << '\n';
+            fmt::print("{0}\n", cpu.get_instruction_pointer());
             cpu.debug_print_flags();
         }
     }

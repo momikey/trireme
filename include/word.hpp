@@ -5,6 +5,8 @@
 #include <array>
 #include <utility>
 
+#include <fmt/format.h>
+
 #include "hexad.hpp"
 
 namespace ternary
@@ -130,6 +132,23 @@ namespace ternary
     // Conversion
     Word bin(const Word& operand) noexcept;
     Word tri(const Word& operand) noexcept;
+}
+
+// Formatter
+namespace fmt {
+    template<>
+    struct formatter<ternary::Word>
+    {
+        // TODO: Better parser
+        template <typename ParseContext>
+        constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
+
+        template <typename FormatContext>
+        auto format(const ternary::Word& w, FormatContext& ctx)
+        {
+            return format_to(ctx.out(), "{0}", w.value_string());
+        }
+    };
 }
 
 #endif /* TRIREME_WORD_HPP */

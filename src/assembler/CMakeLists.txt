@@ -15,4 +15,5 @@ set(DIR_INCLUDES
 )
 
 add_library(trireme_assembler STATIC ${DIR_SOURCES})
-target_include_directories(trireme_assembler PRIVATE ../../include/ ../../thirdparty/include)
+target_include_directories(trireme_assembler PRIVATE ../../include/)
+target_link_libraries(trireme_assembler PUBLIC fmt::fmt)

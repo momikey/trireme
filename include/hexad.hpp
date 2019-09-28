@@ -6,6 +6,8 @@
 #include <array>
 #include <string>
 
+#include <fmt/format.h>
+
 #include "ternary_math.hpp"
 #include "convert.hpp"
 
@@ -271,6 +273,23 @@ namespace ternary {
      * @return Hexad 
      */
     Hexad reverse_diode(const Hexad operand);
+}
+
+// Formatter
+namespace fmt {
+    template<>
+    struct formatter<ternary::Hexad>
+    {
+        // TODO: Better parser
+        template <typename ParseContext>
+        constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
+
+        template <typename FormatContext>
+        auto format(const ternary::Hexad& h, FormatContext& ctx)
+        {
+            return format_to(ctx.out(), "H{0}", h.get());
+        }
+    };
 }
 
 #endif /* TRIREME_HECAD_HPP */

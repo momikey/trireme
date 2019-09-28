@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+add_subdirectory(thirdparty/fmt)
+
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(pegtl)
 
@@ -45,19 +47,20 @@ set(PROJECT_SOURCES ${TRIREME_SOURCES} ${TRIREME_INCLUDES} ${TRIREME_IMPL_INCLUD
 add_compile_options(-Wall)
 
 add_library(libtrireme STATIC ${TRIREME_SOURCES})
-target_include_directories(libtrireme PRIVATE include thirdparty/include)
+target_include_directories(libtrireme PRIVATE include)
+target_link_libraries(libtrireme PUBLIC fmt::fmt)
 
 add_subdirectory(src/assembler)
 
 add_executable(trireme src/main.cpp)
 target_include_directories(trireme PRIVATE include)
-target_link_libraries(trireme libtrireme trireme_assembler taocpp::pegtl)
+target_link_libraries(trireme libtrireme trireme_assembler taocpp::pegtl fmt::fmt)
 
 set(TRIREME_TESTS tests/ternary_math_test.cpp tests/convert_test.cpp tests/hexad_test.cpp)
 add_executable(trireme_test tests/testmain.cpp ${TRIREME_TESTS})
 target_include_directories(trireme_test PRIVATE include thirdparty/include)
 target_compile_definitions(trireme_test PRIVATE BOOST_TEST_DYN_LINK)
-target_link_libraries(trireme_test libtrireme Boost::unit_test_framework taocpp::pegtl)
+target_link_libraries(trireme_test libtrireme Boost::unit_test_framework taocpp::pegtl fmt::fmt)
 add_test(trireme_test trireme_test)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
