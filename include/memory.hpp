@@ -22,7 +22,7 @@ namespace ternary
         Hexad get(const int address) const noexcept { return memory_[with_offset(address)]; }
         void set(const int address, const Hexad& value) noexcept { memory_[with_offset(address)] = value; }
         void set(const int address, const int value) noexcept { memory_[with_offset(address)] = { value }; }
-
+        void clear() noexcept { memory_.fill(0); }
 
         Word get_word(const int address) const
             { return get_word_impl(address, std::integral_constant<std::size_t, Address_Width>()); }

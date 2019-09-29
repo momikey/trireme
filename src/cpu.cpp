@@ -36,6 +36,15 @@ namespace ternary
     }
 
     /**
+     * @brief Clear the simulated CPU's memory.
+     * 
+     */
+    void Cpu::clear_memory()
+    {
+        memory.clear();
+    }
+
+    /**
      * @brief Load data from a map of address/value pairs. This doesn't do
      * much in the way of error-handling yet.
      * 
@@ -58,16 +67,24 @@ namespace ternary
     void Cpu::run()
     {
         // TODO
+        reset();
+
+        while (!step())
+        {
+
+        }
     }
 
     /**
-     * @brief Execute a single instruction on the simulated CPI.
+     * @brief Execute a single instruction on the simulated CPU.
      * 
      */
-    void Cpu::step()
+    bool Cpu::step()
     {
         // TODO
         auto current_ip { instruction_pointer };
+
+        bool breakpoint_encountered { false };
 
         // We wrap the main fetch/decode loop in a try/catch
         // for easier handling of interrupts (since we represent
@@ -102,6 +119,13 @@ namespace ternary
 
             // Now jump to the interrupt handler
             instruction_pointer.set(interrupt_address);
+
+            std::cerr << e.value() << '\n';
+            // For a debug breakpoint, set the return flag
+            if (e.value() == 1)
+            {
+                breakpoint_encountered = true;
+            }
         }
         catch (const std::exception& e)
         {
@@ -117,6 +141,8 @@ namespace ternary
         {
             instruction_pointer.set(add(current_ip.value(), 3).first);
         }
+
+        return breakpoint_encountered;
     }
 
     Hexad Cpu::read_memory(const int ad)
@@ -1235,10 +1261,10 @@ namespace ternary
 
     void Cpu::system_breakpoint()
     {
-        if (flag_register.get_flag(flags::trap))
-        {
+        // if (flag_register.get_flag(flags::trap))
+        // {
             throw debug_breakpoint{};
-        }
+        // }
     }
 
     void Cpu::system_load_register(const int userreg, const int sysreg)

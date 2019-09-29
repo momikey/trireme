@@ -42,35 +42,40 @@ int main(int, char**) {
     Cpu cpu {};
     cpu.reset();
 
-    cpu.debug_set_register(1, 'x');
-    cpu.debug_set_register(2, 0);
-    cpu.debug_set_register(3, 1);
+    // cpu.debug_set_register(1, 'x');
+    // cpu.debug_set_register(2, 0);
+    // cpu.debug_set_register(3, 1);
 
     Opcode opcodes[] {
         { 8, 0, 0, 1, 0, 0 },   // ldi 0, rA
         { 8, 0, 0, 2, 4, 4 },   // ldi %DD, rB
+        { 0, -12, 0, 0,0,0 },   // brk
         { 0, 0, 0, 0, 0, 0 }    // und
     };
 
     try
     {
+        auto address { cpu.get_instruction_pointer().value() };
+
         for (auto& o : opcodes)
         {
-            cpu.debug_decode_instruction(o);
-            // std::cout << cpu.get_instruction_pointer() << '\n';
-            fmt::print("{0}\n", cpu.get_instruction_pointer());
-            cpu.debug_print_flags();
+            // cpu.debug_decode_instruction(o);
+            // // std::cout << cpu.get_instruction_pointer() << '\n';
+            // fmt::print("{0}\n", cpu.get_instruction_pointer());
+            // cpu.debug_print_flags();
+            auto v { o.value };
+            cpu.debug_set_memory(address++, v.low().get());
+            cpu.debug_set_memory(address++, v.middle().get());
+            cpu.debug_set_memory(address++, v.high().get());
         }
+
+        cpu.run();
     }
     catch (const ternary::system_interrupt_base& e)
     {
         std::cerr << e.value() << '\n';
     }
 
-    // auto data { as.assemble_file(sample_filename) };
-    
-    // for (auto& d : data)
-    // {
-    //     std::cout << d.first << '\t' << d.second << '\n';
-    // }
+    cpu.debug_print_flags();
+    fmt::print("{0}\n", cpu.get_instruction_pointer());
 }

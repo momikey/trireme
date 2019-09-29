@@ -63,6 +63,11 @@ namespace ternary
         Hexad low_ {};
     };
 
+    // Common values
+    static constexpr Word ZERO = Word(0, 0, 0);
+    static constexpr Word MIN_WORD = Word(Hexad::min_value, Hexad::min_value, Hexad::min_value);
+    static constexpr Word MAX_WORD = Word(Hexad::max_value, Hexad::max_value, Hexad::max_value);
+
     // Operations on Words
 
     // Convenience types
