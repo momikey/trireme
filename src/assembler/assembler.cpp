@@ -30,4 +30,34 @@ namespace ternary { namespace assembler {
 
         return {};
     }
+
+    Assembler::data_map Assembler::assemble_line(std::string in, int origin)
+    {
+        try
+        {
+            auto result { assemble_line(in, st_, origin) };
+            
+            if (result)
+            {
+                // return st_.data;
+                Assembler::data_map line;
+                std::copy_if(st_.data.begin(), st_.data.end(),
+                    std::inserter(line, line.end()),
+                    [origin](auto v){ return v.first >= origin; });
+
+                return line;
+            }
+            
+        }
+        catch(const tao::pegtl::parse_error& e)
+        {
+            const auto p { e.positions.front() };
+            std::cerr
+                << e.what() << '\n'
+                << in << '\n'
+                << std::string(p.byte_in_line, ' ') << '^' << '\n';          
+        }
+
+        return {};
+    }
 }}

@@ -167,7 +167,9 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             std::string sym { in.begin(), in.end() };
+#ifdef DEBUG
             std::clog << sym << '\t' << s.symbol_table[sym] << '\n';
+#endif
             s.converted = s.symbol_table[sym];
         }
     };
@@ -179,7 +181,9 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             std::string sym { in.begin(), in.end() };
+#ifdef DEBUG
             std::clog << s.instruction_pointer << '\t' << sym << '\t' << s.symbol_table[sym] << '\n';
+#endif
             s.converted = s.symbol_table[sym] - s.instruction_pointer;
         }
     };

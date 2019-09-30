@@ -53,28 +53,48 @@ int main(int, char**) {
         { 0, 0, 0, 0, 0, 0 }    // und
     };
 
-    try
+    auto origin { cpu.get_instruction_pointer().value() };
+    while (true)
     {
-        auto address { cpu.get_instruction_pointer().value() };
+        std::string line;
+        std::getline(std::cin, line);
 
-        for (auto& o : opcodes)
+        auto result { as.assemble_line(line, origin) };
+
+        if (!result.empty())
         {
-            // cpu.debug_decode_instruction(o);
-            // // std::cout << cpu.get_instruction_pointer() << '\n';
-            // fmt::print("{0}\n", cpu.get_instruction_pointer());
-            // cpu.debug_print_flags();
-            auto v { o.value };
-            cpu.debug_set_memory(address++, v.low().get());
-            cpu.debug_set_memory(address++, v.middle().get());
-            cpu.debug_set_memory(address++, v.high().get());
-        }
+            for (auto& d : result)
+            {
+                if (d.first >= origin)
+                    fmt::print("Disassembly {0}\t{1}\n", d.first, d.second);
+            }
 
-        cpu.run();
+            origin += result.size();
+        }
     }
-    catch (const ternary::system_interrupt_base& e)
-    {
-        std::cerr << e.value() << '\n';
-    }
+
+    // try
+    // {
+    //     auto address { cpu.get_instruction_pointer().value() };
+
+    //     for (auto& o : opcodes)
+    //     {
+    //         // cpu.debug_decode_instruction(o);
+    //         // // std::cout << cpu.get_instruction_pointer() << '\n';
+    //         // fmt::print("{0}\n", cpu.get_instruction_pointer());
+    //         // cpu.debug_print_flags();
+    //         auto v { o.value };
+    //         cpu.debug_set_memory(address++, v.low().get());
+    //         cpu.debug_set_memory(address++, v.middle().get());
+    //         cpu.debug_set_memory(address++, v.high().get());
+    //     }
+
+    //     cpu.run();
+    // }
+    // catch (const ternary::system_interrupt_base& e)
+    // {
+    //     std::cerr << e.value() << '\n';
+    // }
 
     cpu.debug_print_flags();
     fmt::print("{0}\n", cpu.get_instruction_pointer());

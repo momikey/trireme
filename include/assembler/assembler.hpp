@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <algorithm>
+#include <iterator>
 
 #include "../hexad.hpp"
 #include "detail/grammar.hpp"
@@ -23,6 +25,7 @@ namespace ternary { namespace assembler {
         using data_map = std::map<int, Hexad>;
 
         data_map assemble_file(std::string filename);
+        data_map assemble_line(std::string line, int origin = 0);
         data_map assemble_string(std::string s);
 
         private:
@@ -38,6 +41,28 @@ namespace ternary { namespace assembler {
             st.operands = decltype(st.operands) {};
 
             return tao::pegtl::parse<grammar, action>(in, st);
+        }
+
+        template<typename State>
+        bool assemble_line(const std::string& in, State&& st, int origin)
+        {
+            using line_and_eof = tao::pegtl::seq<line, tao::pegtl::eolf>;
+
+            tao::pegtl::string_input<> in_fp(in, "immediate");
+
+            st.instruction_pointer = origin;
+            st.operands = decltype(st.operands) {};
+            auto first_pass_result { tao::pegtl::parse<line_and_eof, firstpass>(in_fp, st) };
+
+            if (first_pass_result)
+            {
+                st.instruction_pointer = origin;
+                st.operands = decltype(st.operands) {};
+
+            }
+
+            tao::pegtl::string_input<> input(in, "immediate");
+            return tao::pegtl::parse<line_and_eof, action>(input, st);
         }
 
         state st_ {};
