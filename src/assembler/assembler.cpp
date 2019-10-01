@@ -35,17 +35,22 @@ namespace ternary { namespace assembler {
     {
         try
         {
-            auto result { assemble_line(in, st_, origin) };
+            // Copy the existing state, but clear the output map.
+            // This lets us keep things like labels for a whole session.
+            state immediate_state { st_ };
+            immediate_state.data.clear();
+
+            auto result { assemble_line(in, immediate_state, origin) };
             
             if (result)
             {
-                // return st_.data;
-                Assembler::data_map line;
-                std::copy_if(st_.data.begin(), st_.data.end(),
-                    std::inserter(line, line.end()),
-                    [origin](auto v){ return v.first >= origin; });
+                return immediate_state.data;
+                // Assembler::data_map line;
+                // std::copy_if(st_.data.begin(), st_.data.end(),
+                //     std::inserter(line, line.end()),
+                //     [origin](auto v){ return v.first >= origin; });
 
-                return line;
+                // return line;
             }
             
         }
