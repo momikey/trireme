@@ -14,6 +14,8 @@
 #include "assembler/assembler.hpp"
 #include "assembler/detail/state.hpp"
 
+#include "shell/shell.hpp"
+
 #include <fmt/core.h>
 
 using namespace ternary;
@@ -42,36 +44,40 @@ int main(int, char**) {
     Cpu cpu {};
     cpu.reset();
 
+    ternary::shell::Shell shell { cpu };
+
+    shell.start();
+
     // cpu.debug_set_register(1, 'x');
     // cpu.debug_set_register(2, 0);
     // cpu.debug_set_register(3, 1);
 
-    Opcode opcodes[] {
-        { 8, 0, 0, 1, 0, 0 },   // ldi 0, rA
-        { 8, 0, 0, 2, 4, 4 },   // ldi %DD, rB
-        { 0, -12, 0, 0,0,0 },   // brk
-        { 0, 0, 0, 0, 0, 0 }    // und
-    };
+    // Opcode opcodes[] {
+    //     { 8, 0, 0, 1, 0, 0 },   // ldi 0, rA
+    //     { 8, 0, 0, 2, 4, 4 },   // ldi %DD, rB
+    //     { 0, -12, 0, 0,0,0 },   // brk
+    //     { 0, 0, 0, 0, 0, 0 }    // und
+    // };
 
-    auto origin { cpu.get_instruction_pointer().value() };
-    while (true)
-    {
-        std::string line;
-        std::getline(std::cin, line);
+    // auto origin { cpu.get_instruction_pointer().value() };
+    // while (true)
+    // {
+    //     std::string line;
+    //     std::getline(std::cin, line);
 
-        auto result { as.assemble_line(line, origin) };
+    //     auto result { as.assemble_line(line, origin) };
 
-        if (!result.empty())
-        {
-            for (auto& d : result)
-            {
-                if (d.first >= origin)
-                    fmt::print("Disassembly {0}\t{1}\n", d.first, d.second);
-            }
+    //     if (!result.empty())
+    //     {
+    //         for (auto& d : result)
+    //         {
+    //             if (d.first >= origin)
+    //                 fmt::print("Disassembly {0}\t{1}\n", d.first, d.second);
+    //         }
 
-            origin += result.size();
-        }
-    }
+    //         origin += result.size();
+    //     }
+    // }
 
     // try
     // {
@@ -96,6 +102,6 @@ int main(int, char**) {
     //     std::cerr << e.value() << '\n';
     // }
 
-    cpu.debug_print_flags();
-    fmt::print("{0}\n", cpu.get_instruction_pointer());
+    // cpu.debug_print_flags();
+    // fmt::print("{0}\n", cpu.get_instruction_pointer());
 }
