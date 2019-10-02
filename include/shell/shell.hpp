@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 #include <fmt/format.h>
 #include <replxx.hxx>
 
@@ -30,7 +32,7 @@ namespace ternary { namespace shell {
         Word ip_;
 
         // Helper functions
-        std::string prompt();
+        std::string prompt(const std::string& continuation);
 
         void assemble_instruction(const std::string& input);
         void handle_command(const std::string& input);

@@ -1,6 +1,7 @@
 #include "shell/shell.hpp"
 
 using namespace ternary::shell;
+namespace algo = boost::algorithm;
 
 Shell::Shell(Cpu& cpu): cpu_(cpu), repl_(), asm_(), ip_(cpu_.get_instruction_pointer())
 {
@@ -12,14 +13,14 @@ Shell::Shell(Cpu& cpu): cpu_(cpu), repl_(), asm_(), ip_(cpu_.get_instruction_poi
 void Shell::start()
 {
     // Labels can't be on a line by themselves, so we need to build them up.
-    std::string multiline_container {};
+    std::string multiline_input {};
 
     for (;;)
     {
         const char* cinput { nullptr };
         do
         {
-            cinput = repl_.input(prompt());
+            cinput = repl_.input(prompt(multiline_input));
         } while ((cinput == nullptr) && (errno == EAGAIN));
 
         if (cinput == nullptr)
@@ -29,6 +30,19 @@ void Shell::start()
 
         std::string input { cinput };
 
+        // Multline handling hack
+        if (algo::ends_with(algo::trim_copy(input), ":"))
+        {
+            multiline_input.append(input);
+            continue;
+        }
+        if (!multiline_input.empty())
+        {
+            input = multiline_input + input;
+            multiline_input.clear();
+        }
+
+        // General handling
         if (input.empty())
         {
             continue;
@@ -39,7 +53,7 @@ void Shell::start()
         }
         else
         {
-            if (input[0] == '.')
+            if (input.front() == '.')
             {
                 handle_command(input.substr(1));
             }
@@ -51,17 +65,24 @@ void Shell::start()
     }
 }
 
-std::string Shell::prompt()
+std::string Shell::prompt(const std::string& continuation)
 {
     auto actual_ip { cpu_.get_instruction_pointer() };
 
+    auto cont_prompt { ""s };
+
+    if (!continuation.empty())
+    {
+        cont_prompt = fmt::format(" \x1b[1;33m{0}\x1b[0m", continuation.c_str());
+    }
+
     if (ip_ == actual_ip)
     {
-        return fmt::format("\x1b[1;32m{0}\x1b[0m > ", ip_);
+        return fmt::format("\x1b[1;32m{0}\x1b[0m{1} > ", ip_, cont_prompt);
     }
     else
     {
-        return fmt::format("\x1b[1;92m{0}\x1b[0m \x1b[32m(IP {1})\x1b[0m > ", ip_, actual_ip);
+        return fmt::format("\x1b[1;92m{0}\x1b[0m \x1b[32m(IP {1})\x1b[0m{2} > ", ip_, actual_ip, cont_prompt);
     }
 }
 

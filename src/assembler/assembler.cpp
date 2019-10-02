@@ -44,6 +44,15 @@ namespace ternary { namespace assembler {
             
             if (result)
             {
+                // An immediate instruction in the shell may change the
+                // symbol table, so we have to account for that.
+                // (In C++17, we can do this with a simple call to `merge`.
+                // No such luck in C++14.)
+                for (auto&& kv : immediate_state.symbol_table)
+                {
+                    st_.symbol_table[kv.first] = kv.second;
+                }
+
                 return immediate_state.data;
                 // Assembler::data_map line;
                 // std::copy_if(st_.data.begin(), st_.data.end(),
