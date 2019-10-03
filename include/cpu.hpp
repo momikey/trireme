@@ -53,14 +53,13 @@ namespace ternary
         Word get_memory_word(int address) const
             { return { memory.get_word(address) }; }
         Word get_instruction_pointer() const { return instruction_pointer; }
+        void print_flags() const { std::clog << flag_register.to_string() << '\n'; }
+        void set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
+        void set_memory(int addr, int value) { memory.set(addr, value); }
+        void set_reg(int reg, int value) { registers.set(reg, value); }
 
-        // Methods for debugging - these give direct access to memory, registers, etc.
-        
-        void debug_print_flags() const { std::clog << flag_register.to_string() << '\n'; }
-        void debug_set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
+        // Debugging methods
         void debug_decode_instruction(Opcode& op) { decode_major(op); }
-        void debug_set_memory(int addr, int value) { memory.set(addr, value); }
-        void debug_set_register(int reg, int value) { registers.set(reg, value); }
 
         private:
         static constexpr auto control_register_count = 4;
