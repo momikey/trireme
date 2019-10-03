@@ -1,13 +1,37 @@
 #include "shell/shell.hpp"
 
+using namespace std::string_literals;
+
+using namespace std::placeholders;
+
 using namespace ternary::shell;
 namespace algo = boost::algorithm;
+using replxx::Replxx;
 
 Shell::Shell(Cpu& cpu): cpu_(cpu), repl_(), asm_(), ip_(cpu_.get_instruction_pointer())
 {
     cpu_.reset();
 
+    repl_.set_max_history_size(100);
 
+    ////
+    // Insert keybindings. These are pretty basic for now:
+    // * Ctrl-C: Cancel line)
+    // * Ctrl-W: Delete word
+    // * Up: Previous in history list
+    // * Down: Next in history list
+    ////
+    repl_.bind_key(Replxx::KEY::control('c'),
+        std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::ABORT_LINE, _1));
+    repl_.bind_key(Replxx::KEY::control('d'),
+        std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::SEND_EOF, _1));
+    repl_.bind_key(Replxx::KEY::control('w'),
+        std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::KILL_TO_BEGINING_OF_WORD, _1));
+
+    repl_.bind_key(Replxx::KEY::UP,
+        std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::HISTORY_PREVIOUS, _1));
+    repl_.bind_key(Replxx::KEY::DOWN,
+        std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::HISTORY_NEXT, _1));
 }
 
 void Shell::start()
@@ -25,6 +49,8 @@ void Shell::start()
 
         if (cinput == nullptr)
         {
+            // This means we got an EOF, so exit gracefully with a newline
+            repl_.print("\n");
             break;
         }
 
@@ -47,7 +73,7 @@ void Shell::start()
         {
             continue;
         }
-        else if (input == ".quit"s)
+        else if (input == ".quit"s || input == ".exit"s)
         {
             break;
         }
@@ -61,6 +87,8 @@ void Shell::start()
             {
                 assemble_instruction(input);
             }
+
+            repl_.history_add(input);
         }
     }
 }

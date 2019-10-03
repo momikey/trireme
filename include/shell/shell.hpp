@@ -2,6 +2,8 @@
 #define TRIREME_SHELL_HPP
 
 #include <string>
+#include <functional>
+#include <iostream>
 
 #include <boost/algorithm/string.hpp>
 
@@ -12,8 +14,6 @@
 #include "word.hpp"
 
 #include "assembler/assembler.hpp"
-
-using namespace std::string_literals;
 
 namespace ternary { namespace shell {
     class Shell
