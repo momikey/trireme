@@ -142,10 +142,19 @@ void Shell::handle_command(const std::string& input)
 {
     std::regex command { R"(^(\w+)(?:\s+(.*))?)" };
     std::smatch matches;
+
+    auto word_to_value = [] (std::string raw) {
+        return (raw.front() != '%') ? std::stoi(raw) : string_to_value(raw.substr(1));
+    };
+
     if (std::regex_match(input, matches, command))
     {
         if (matches[1] == "reg")
         {
+            ////
+            // Get or set a register
+            ////
+
             // Try to match a register and (optionally) a setter
             std::smatch reg_matches;
             std::string rest { matches[2].str() };
@@ -165,11 +174,43 @@ void Shell::handle_command(const std::string& input)
                 {
                     // Set register
                     const auto raw_value { reg_matches[2].str() };
-                    auto value = (raw_value[0] != '%') ?
-                        std::stoi(raw_value) : string_to_value(raw_value.substr(1));
+                    // auto value = (raw_value[0] != '%') ?
+                    //     std::stoi(raw_value) : string_to_value(raw_value.substr(1));
+                    auto value = word_to_value(raw_value);
                     
                     cpu_.set_reg(reg_number, value);
                 }
+            }
+            else
+            {
+                repl_.print("Invalid format\n");
+            }
+        }
+        else if (matches[1] == "mem" || matches[1] == "memory")
+        {
+            ////
+            // Get or set memory
+            ////
+
+            std::smatch mem_matches;
+            std::string rest { matches[2].str() };
+            if (std::regex_match(rest, mem_matches, match_memory))
+            {
+                if (mem_matches[2].str().empty())
+                {
+                    // Get memory
+                    auto result { cpu_.get_memory_word(word_to_value(mem_matches[1].str())) };
+
+                    repl_.print("Mem %s: %s\n", mem_matches[1].str().c_str(),
+                        fmt::format("\x1b[1m{0}\x1b[0m ({1})", result, result.value()).c_str());
+                }
+                else
+                {
+                    auto address = word_to_value(mem_matches[1].str());
+                    auto value = word_to_value(mem_matches[2].str());
+
+                    cpu_.set_memory_word(address, value);
+                }   
             }
             else
             {

@@ -56,6 +56,7 @@ namespace ternary
         void print_flags() const { std::clog << flag_register.to_string() << '\n'; }
         void set_flag(flags f, const int value) { flag_register.set_flag(f, value); }
         void set_memory(int addr, int value) { memory.set(addr, value); }
+        void set_memory_word(int address, int value) { memory.set_word(address, { value }); }
         void set_reg(int reg, int value) { registers.set(reg, value); }
 
         // Debugging methods

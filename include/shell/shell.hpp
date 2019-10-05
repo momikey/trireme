@@ -51,6 +51,8 @@ namespace ternary { namespace shell {
     static const std::string balanced_integer { R"((?:[+-]?[0-9]{1,9})|(?:%[A-Mn-z0]{1,6}))" };
     static const std::regex match_register { fmt::format(R"({0}(?:\s*=\s*({1}))?)",
         register_name, balanced_integer) };
+    static const std::regex match_memory { fmt::format(R"(({0})(?:\s*=\s*({1}))?)",
+        balanced_integer, balanced_integer) };
 }}
 
 #endif /* TRIREME_SHELL_HPP */
