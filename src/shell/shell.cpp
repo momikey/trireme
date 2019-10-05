@@ -32,6 +32,11 @@ Shell::Shell(Cpu& cpu): cpu_(cpu), repl_(), asm_(), ip_(cpu_.get_instruction_poi
         std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::HISTORY_PREVIOUS, _1));
     repl_.bind_key(Replxx::KEY::DOWN,
         std::bind(&Replxx::invoke, &repl_, Replxx::ACTION::HISTORY_NEXT, _1));
+
+    ////
+    // Insert shell commands
+    ////
+    commands["reg"] = std::bind(&Shell::handle_register, this, _1);
 }
 
 void Shell::start()
@@ -81,7 +86,7 @@ void Shell::start()
         {
             if (input.front() == '.')
             {
-                handle_command(input.substr(1));
+                handle_command(algo::trim_copy(input.substr(1)));
             }
             else
             {
@@ -135,5 +140,49 @@ void Shell::assemble_instruction(const std::string& input)
 
 void Shell::handle_command(const std::string& input)
 {
+    std::regex command { R"(^(\w+)(?:\s+(.*))?)" };
+    std::smatch matches;
+    if (std::regex_match(input, matches, command))
+    {
+        if (matches[1] == "reg")
+        {
+            // Try to match a register and (optionally) a setter
+            std::smatch reg_matches;
+            std::string rest { matches[2].str() };
+            if (std::regex_match(rest, reg_matches, match_register))
+            {
+                const auto reg_number { string_to_value(reg_matches[1].str()) };
+
+                if (reg_matches[2].str().empty())
+                {
+                    // Get register
+                    auto result { cpu_.get_register(reg_number) };
+
+                    repl_.print("r%s: %s\n", reg_matches[1].str().c_str(),
+                        fmt::format("\x1b[1m{0}\x1b[0m ({1})", result, result.value()).c_str());
+                }
+                else
+                {
+                    // Set register
+                    const auto raw_value { reg_matches[2].str() };
+                    auto value = (raw_value[0] != '%') ?
+                        std::stoi(raw_value) : string_to_value(raw_value.substr(1));
+                    
+                    cpu_.set_reg(reg_number, value);
+                }
+            }
+            else
+            {
+                repl_.print("Invalid format\n");
+            }
+        }
+    }
+
     repl_.print("%s\n", fmt::format("{0}: {1}", ip_, input).c_str());
+}
+
+bool Shell::handle_register(const std::string& rest)
+{
+    repl_.print("%s\n", rest.c_str());
+    return true;
 }
