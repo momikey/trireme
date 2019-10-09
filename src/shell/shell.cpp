@@ -217,6 +217,16 @@ void Shell::handle_command(const std::string& input)
                 repl_.print("Invalid format\n");
             }
         }
+        else if (matches[1] == 'assemble' || matches[1] == 'asm')
+        {
+            ////
+            // Assemble a file and load into memory
+            ////
+
+            std::string filename { matches[2].str() };
+
+            
+        }
     }
 
     repl_.print("%s\n", fmt::format("{0}: {1}", ip_, input).c_str());
