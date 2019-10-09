@@ -47,18 +47,18 @@ namespace ternary { namespace assembler {
     template<>
     struct action<ascii::print> : unescape::append_all {};
 
-    template<>
-    struct action<string_literal>
-    {
-        template<typename Input, typename State>
-        static void apply(const Input& in, State& s)
-        {
-            for (auto& c : s.unescaped)
-            {
-                s.data[s.instruction_pointer++] = c;
-            }
-        }
-    };
+    // template<>
+    // struct action<string_literal>
+    // {
+    //     template<typename Input, typename State>
+    //     static void apply(const Input& in, State& s)
+    //     {
+    //         for (auto& c : s.unescaped)
+    //         {
+    //             s.data[s.instruction_pointer++] = c;
+    //         }
+    //     }
+    // };
 
     template<>
     struct action<immediate_6>
@@ -281,6 +281,26 @@ namespace ternary { namespace assembler {
                 s.data[s.instruction_pointer++] = word.middle();
                 s.data[s.instruction_pointer++] = word.high();
             }
+        }
+    };
+
+    template<>
+    struct action<directive_ds>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            // DS defines strings, which are considered as sequences
+            // of bytes encoded into hexads. These are stored as with
+            // the DH directive above, but they're ASCII (or maybe UTF-8).
+
+            for (auto&& c : s.unescaped)
+            {
+                s.data[s.instruction_pointer++] = { int{c} };
+            }
+
+            // Add null terminator
+            s.data[s.instruction_pointer++] = { 0 };
         }
     };
 

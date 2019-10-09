@@ -1824,6 +1824,18 @@ namespace ternary { namespace assembler {
     };
 
     template<>
+    struct action<in_lad>
+    {
+        template<typename Input, typename State>
+        static void apply(const Input& in, State& s)
+        {
+            s.o = 8;
+            s.m = 8;
+            s.op ="lad";
+        }
+    };
+
+    template<>
     struct action<in_ldl>
     {
         template<typename Input, typename State>
@@ -2510,6 +2522,9 @@ namespace ternary { namespace assembler {
 
     template<>
     struct action<branch_immediate> : action<logical_immediate> {};
+
+    template<>
+    struct action<load_address> : action<load_basic> {};
 }}
 
 #endif /* TRIREME_INSTRUCTION_ACTIONS_HPP */

@@ -686,6 +686,10 @@ namespace ternary { namespace assembler {
     struct in_ssr :
         TAO_PEGTL_KEYWORD("ssr")
     {};
+
+    struct in_lad :
+        TAO_PEGTL_KEYWORD("lad")
+    {};
     
     struct arithmetic_basic_instruction :
         sor<
@@ -1105,6 +1109,14 @@ namespace ternary { namespace assembler {
         >
     {};
 
+    struct load_address :
+        seq<
+            in_lad,
+            star< blank >,
+            memory_12
+        >
+    {};
+
     struct store_basic :
         seq<
             sor<
@@ -1228,6 +1240,7 @@ namespace ternary { namespace assembler {
             load_basic,
             load_immediate,
             load_indexed,
+            load_address,
             store_basic,
             store_indexed,
             load_store_indirect,

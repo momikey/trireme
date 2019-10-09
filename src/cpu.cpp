@@ -494,6 +494,9 @@ namespace ternary
             case 7:
                 load_register_indirect(op.y, op.z, hexad_select::high);
                 break;
+            case 8:
+                load_register_address(op.low12());
+                break;
             case 9:
                 load_register_indirect(op.y, op.z, hexad_select::full_word);
                 break;
@@ -764,6 +767,24 @@ namespace ternary
         }
 
         flag_register.set_flag(flags::sign, sign_c(registers.get(destreg).value()));
+    }
+
+    void Cpu::load_register_address(const int addr)
+    {
+        Word w;
+
+        if (flag_register.get_flag(flags::absolute))
+        {
+            w.set(add(registers.get(-3), addr).first);
+        }
+        else
+        {
+            w = addr;
+        }
+
+        w.set_high(0);
+
+        registers.set(0, w);        
     }
 
     void Cpu::store_register_memory(const int reg, const int addr, hexad_select type)

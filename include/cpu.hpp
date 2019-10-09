@@ -126,6 +126,7 @@ namespace ternary
         void load_register_immediate(const int reg, const int value, hexad_select type);
         void load_register_indirect(const int addrreg, const int destreg, hexad_select type);
         void load_register_indexed(const int destreg, const int addr);
+        void load_register_address(const int addr);
         void store_register_memory(const int reg, const int addr, hexad_select type);
         void store_register_indirect(const int srcreg, const int addrreg, hexad_select type);
         void store_register_indexed(const int srcreg, const int addr);
