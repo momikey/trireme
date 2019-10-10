@@ -2524,7 +2524,7 @@ namespace ternary { namespace assembler {
     struct action<branch_immediate> : action<logical_immediate> {};
 
     template<>
-    struct action<load_address> : action<load_basic> {};
+    struct action<load_address> : action<branch_basic> {};
 }}
 
 #endif /* TRIREME_INSTRUCTION_ACTIONS_HPP */

@@ -110,6 +110,9 @@ namespace ternary
         // Decoding for branch/skip insstructions (O field = 10)
         void decode_minor_branch(Opcode&);
 
+        // Decoding for register set instructions (O field = -6)
+        void decode_minor_set(Opcode&);
+
         // Decoding for I/O instructions (O field = -8)
         void decode_minor_io(Opcode&);
 

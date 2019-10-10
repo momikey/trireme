@@ -69,9 +69,14 @@ namespace ternary
         // TODO
         reset();
 
-        while (!step())
+        while (true)
         {
+            auto breakpoint { step() };
 
+            if (breakpoint)
+            {
+                break;
+            }
         }
     }
 
@@ -120,7 +125,6 @@ namespace ternary
             // Now jump to the interrupt handler
             instruction_pointer.set(interrupt_address);
 
-            std::cerr << e.value() << '\n';
             // For a debug breakpoint, set the return flag
             if (e.value() == 1)
             {
@@ -277,7 +281,7 @@ namespace ternary
                 undefined_opcode(op);
                 break;
             case -6:
-                undefined_opcode(op);
+                decode_minor_set(op);
                 break;
             case -7:
                 undefined_opcode(op);
@@ -369,7 +373,7 @@ namespace ternary
                 rotate_register(op.x, op.low6(), true);
                 break;
             case -8:
-                compare_immediate(op.y, op.low6());
+                compare_immediate(op.x, op.low6());
                 break;
             case -9:
                 compare_register(op.y, op.z);
@@ -539,12 +543,13 @@ namespace ternary
                 branch_absolute(op.low12());
                 break;
             case 11:
-                set_flag_to_value(static_cast<flags>(op.z), -1);
+                branch_on_flag(3, op.z, -1);
+                break;
             case 12:
-                set_flag_to_value(static_cast<flags>(op.z), 0);
+                branch_on_flag(3, op.z, 0);
                 break;
             case 13:
-                set_flag_to_value(static_cast<flags>(op.z), 1);
+                branch_on_flag(3, op.z, 1);
                 break;
             case -1:
                 branch_relative(op.low6());
@@ -584,6 +589,24 @@ namespace ternary
             case 9:
                 store_register_indirect(op.y, op.z, hexad_select::full_word);
                 break;
+            default:
+                undefined_opcode(op);
+                break;
+        }
+    }
+
+    void Cpu::decode_minor_set(Opcode& op)
+    {
+        switch (op.m)
+        {
+            case 0:
+                set_flag_to_value(static_cast<flags>(op.z), 0);
+                break;
+            case 1:
+                set_flag_to_value(static_cast<flags>(op.z), 1);
+                break;
+            case -1:
+                set_flag_to_value(static_cast<flags>(op.z), -1);
             default:
                 undefined_opcode(op);
                 break;
