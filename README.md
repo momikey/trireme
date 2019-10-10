@@ -2,6 +2,17 @@
 
 Trireme is a simulator for a hypothetical computer system designed around [balanced ternary](https://en.wikipedia.org/Balanced_ternary) arithmetic.
 
+## Installation
+
+Trireme uses CMake for configuration and compilation. It uses a few third-party libraries:
+
+* [Boost](https://www.boost.org) (1.66.0+)
+* [PEGTL](https://github.com/taocpp/PEGTL/tree/2.x) (2.7.1+)
+* [fmt](https://fmt.dev/) (6.0.0+)
+* [Replxx](https://github.com/AmokHuginnsson/replxx) (0.0.2)
+
+In the future, I'd like to set up Conan or some other dependency manager. For now, I have Boost and PEGTL installed globally, with fmt and Replxx copied into the `thirdparty` directory (not included in this repo).
+
 ## Rationale
 
 Although essentially every computer in existence today relies on binary arithmetic, other bases are possible, and they have been used historically. Decimal-based systems were once somewhat common in the US, while the USSR's (mostly experimental) Setun functioned using balanced ternary. Trireme is my attempt at exploring the possibilities offered by the change of this most fundamental level of computing. It's intended for experimenting, education, and a way to see just how many of our assumptions rely on binary.
@@ -51,6 +62,34 @@ All the usual arithmetic works the same in ternary as it does in binary, so you 
 * `tem` is nothing more than a tritwise multiplication.
 
 There are, in fact, thousands more basic operators, but these are the ones Trireme uses at present. In the future, I may add new instructions for some of the rest, depending on what looks to be necessary or useful.
+
+### Note on notation
+
+For ease of writing and understanding, I have devised a base-27 encoding for Trireme integers. Base-27 numbers are in all cases prefixed with %. (I chose this symbol because it evokes a balance scale, appropriate for balanced ternary.)
+
+Digits use the numeral 0, the uppercase letters A-M, and the lowercase letters n-z. 0 obviously represents 0. The uppercase letters are increasing positive integers (A=1, B=2, etc.), while the lowercase set represents decreasing negative integers (n=-1 to z=-13).
+
+As 27 is the cube of 3 (3<sup>3</sup> = 27), each base-27 digit encodes three trits. Thus, a hexad is two digits, and a machine word six. This is similar to hexadecimal notation, in which two digits make a byte, while four, eight, or 16 make a word.
+
+Some examples of the notation:
+
+* %00 = 0
+* %0A = 1
+* %0w = -10
+* %By = 42
+* %000ABC = 786
+* %0n0000 = -531441
+* %vKutCI = -123456789
+
+## The shell
+
+Trireme comes with a rudimentary shell that allows you to explore the simulated CPU. From this command-line interface, you can type assembly instructions, and they will be assembled and inserted into the CPU's memory. In addition, you have access to the following commands:
+
+* `.reg R# (= value)` prints or sets the value of any of the CPU's 27 accessible registers. These are "numbered" as `r0`, `rA-rM`, and `rn-rz`. Note that the letters *are* case-sensitive; uppercase letters indicate general-purpose registers, while lowercase letters are for special-purpose registers, not all of which are used at present. Values can be specified as decimal integers or in the base-27 notation described above.
+* `.mem address (= value)` prints or sets the value of the memory word starting at `address`. Both the address and value can be given as integers in decimal or base-27. Note that Trireme currently does no checking to ensure alignment.
+* `.ip address` sets the instruction pointer to `address`. In this case, the value you give may be changed to be word-aligned; for Trireme, this means the lowest trit should be negative, so an IP value of 0 will be realigned to -1.
+* `.at address` sets a "virtual" instruction pointer. This isn't where program execution will start. Instead, it is where the next assembled instruction will be stored. An alternative command, `.org`, may be used in place of `.at`; this may be more familiar to users of binary assemblers.
+* `.run` begins execution at the address given by the instruction pointer. Execution continues until a debug breakpoint (`brk` instruction) or some other error. At present, Trireme has very little in the way of error checking, so beware of infinite loops and other problems.
 
 ## License
 
