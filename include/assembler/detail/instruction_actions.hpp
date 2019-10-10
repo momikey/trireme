@@ -961,6 +961,7 @@ namespace ternary { namespace assembler {
             // DEC rX 0++ -0+ RRR 000 000 00+
             s.o = 4;
             s.m = -8;
+            s.z = 1;
             s.x = s.y = 0;
             s.op = "dec";
         }

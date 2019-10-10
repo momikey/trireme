@@ -248,7 +248,9 @@ void Shell::handle_command(const std::string& input)
         }
     }
 
+#ifndef NDEBUG
     repl_.print("%s\n", fmt::format("{0}: {1}", ip_, input).c_str());
+#endif
 }
 
 bool Shell::handle_register(const std::string& rest)

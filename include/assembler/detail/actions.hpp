@@ -167,7 +167,7 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             std::string sym { in.begin(), in.end() };
-#ifdef DEBUG
+#ifndef NDEBUG
             std::clog << sym << '\t' << s.symbol_table[sym] << '\n';
 #endif
             s.converted = s.symbol_table[sym];
@@ -181,8 +181,8 @@ namespace ternary { namespace assembler {
         static void apply(const Input& in, State& s)
         {
             std::string sym { in.begin(), in.end() };
-#ifdef DEBUG
-            std::clog << s.instruction_pointer << '\t' << sym << '\t' << s.symbol_table[sym] << '\n';
+#ifndef NDEBUG
+            std::clog << Word(s.instruction_pointer).value_string() << '\t' << sym << '\t' << s.symbol_table[sym] << '\n';
 #endif
             s.converted = s.symbol_table[sym] - s.instruction_pointer;
         }
@@ -377,9 +377,10 @@ namespace ternary { namespace assembler {
             s.data[s.instruction_pointer+1] = s.t * pow3(3) + s.x;
             s.data[s.instruction_pointer+2] = s.o * pow3(3) + s.m;
 
+#ifndef NDEBUG
             // Debugging message
             std::clog
-                << s.instruction_pointer << '\t'
+                << Word(s.instruction_pointer).value_string() << '\t'
                 << s.op << '\t'
                 << s.o << '\t'
                 << s.m << '\t'
@@ -388,7 +389,7 @@ namespace ternary { namespace assembler {
                 << s.y << '\t'
                 << s.z << '\n'
             ;
-
+#endif
             // All Trireme instructions are 1 word, or 3 hexads,
             // and these *must* be word-aligned.
             s.instruction_pointer += 3;

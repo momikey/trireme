@@ -25,26 +25,50 @@ namespace ternary
         }
     }
 
-    void DebugIo::write(char c)
+    void DebugIo::write(int input)
     {
-        if (c)
+        switch (mode)
         {
-            backing_output.push_back(c);
+            case 0:
+            {
+                if (input)
+                {
+                    backing_output.push_back(static_cast<unsigned char>(input));
+                }
+                else
+                {
+                    print_and_clear();
+                }
+                break;
+            }
+            case 1:
+            {
+                backing_output = std::to_string(input);
+                print_and_clear();
+                break;
+            }
+            case -1:
+            {
+                Word w { input };
+                backing_output = w.value_string();
+                print_and_clear();
+                break;
+            }
+            default:
+                break;
         }
-        else
-        {
-            print();
-            backing_output.clear();
-        }
+
     }
 
     int DebugIo::read_control()
     {
-        return request;
+        return mode * 3 + request;
     }
 
     void DebugIo::write_control(int value)
     {
         request = low_trits(value, 1);
+
+        mode = shift_right(low_trits(value, 2), 1);
     }
 }

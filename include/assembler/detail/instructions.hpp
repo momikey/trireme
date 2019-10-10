@@ -857,7 +857,8 @@ namespace ternary { namespace assembler {
     struct logical_single_t :
         seq<
             sor<
-                in_inc
+                in_inc,
+                in_dec
             >,
             star< blank >,
             cpu_register

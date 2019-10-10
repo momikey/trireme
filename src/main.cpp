@@ -38,7 +38,6 @@ std::ostream& operator<<(std::ostream& os, std::pair<T, U> pair)
 int main(int, char**) {
     using namespace std::string_literals;
 
-    std::string sample_filename { "sandbox/sample.txt" };
     ternary::assembler::Assembler as {};
 
     Cpu cpu {};
