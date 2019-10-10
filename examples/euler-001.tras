@@ -1,0 +1,35 @@
+; Solves Project Euler problem #1: Sum of multiples of 3 and 5 from 1 - 1000
+; I make no attempt at being optimized for space.
+; (Optimizing for time doesn't make sense, as Trireme doesn't yet have
+; cycle counting implemented.)
+
+; Origin at boot address, since this is an example
+    ad %zzzz
+
+; Set debug output to decimal
+    ldi r0, 3
+    out r0, @%I0
+
+; Main loop
+; We count down because it's easier to test for 0 than arbitrary values
+    lad 999         ; r0 will hold our counter
+    clr rA          ; rA holds our running total
+
+loop:
+    mov rB, r0      ; temporary
+    shr rB, 1       ; the old "shift to divide" trick
+    bzc addtoctr    ; but it's base-3 instead of base-2
+    dvi r0, rz, 5   ; modulus is just division but throwing away the quotient
+    cmi ru, 0       ; remainder is always stored in ru after division
+    bps loopdec     ; we know this is either 0 or positive
+
+addtoctr:
+    add r0, rA      ; add to our total
+
+loopdec:
+    dec r0
+    bps loop        ; if the sign value is positive, r0 > 0
+
+end:
+    out rA, @%Io    ; print the total
+    brk             ; exit gracefully
