@@ -217,7 +217,7 @@ void Shell::handle_command(const std::string& input)
                 repl_.print("Invalid format\n");
             }
         }
-        else if (matches[1] == 'assemble' || matches[1] == 'asm')
+        else if (matches[1] == "assemble" || matches[1] == "asm")
         {
             ////
             // Assemble a file and load into memory
@@ -225,7 +225,26 @@ void Shell::handle_command(const std::string& input)
 
             std::string filename { matches[2].str() };
 
-            
+            auto data { asm_.assemble_file(filename) };
+
+            if (!data.empty())
+            {
+                cpu_.load(data);
+            }
+            else
+            {
+                repl_.print("Assembly failed\n");
+            }
+        }
+        else if (matches[1] == "run")
+        {
+            ////
+            // Start the CPU
+            ////
+
+            ip_ = cpu_.get_instruction_pointer();
+
+            cpu_.run();
         }
     }
 
