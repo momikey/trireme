@@ -1,0 +1,34 @@
+; Simple "Hello world" example to test assembler
+
+ad %zzzz
+
+; A simple string printing loop
+; We'll use the r0 to hold the address of the next character,
+; rA for the character itself. I/O location @Io is the debug
+; write port, which builds a string from repeated writes, then
+; prints it to stdout after receiving a null terminator.
+
+; Debug: Uncomment this section to output integer values instead
+; of ASCII characters. Change the sign for ternary base-27 output.
+
+;    ldi r0, 3       ; load r0 with trit 0 positive
+;    out r0, @%I0     ; write to debug I/O control
+
+; Get the address of our string
+    lad hello       ; r0 is implied
+    clr rA          ; clear register to 0
+
+; String printing loop
+loop:
+    lal r0, rA      ; load lowest hexad of [r0] into rA
+    out rA, @%Io    ; send character to debug output
+    cmi rA, 0       ; check for rA == 0 (null terminator)
+    bzs end         ; jump if we're at the end
+    inc r0          ; move the pointer ahead
+    brs loop        ; loop
+
+end:
+    brk             ; exit gracefully
+
+; Strings are null-terminated by default
+hello: ds "Hello, world!"
