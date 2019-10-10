@@ -46,7 +46,12 @@ namespace ternary
         bool step();
         void clear_memory();
 
-        // Getters for various parts of the simulator
+        // Word alignment helpers
+        static constexpr int align(int value)
+            { return (lowest_trit(value) == -1 ? value : value - (lowest_trit(value) - -1)); }
+        static constexpr Word align(Word w) { return { align(w.value())}; }
+        
+        // Getters and setters for various parts of the simulator
 
         Word get_register(int reg) const { return registers.get(reg); }
         Hexad get_memory(int address) const { return memory.get(address); }
@@ -58,6 +63,7 @@ namespace ternary
         void set_memory(int addr, int value) { memory.set(addr, value); }
         void set_memory_word(int address, int value) { memory.set_word(address, { value }); }
         void set_reg(int reg, int value) { registers.set(reg, value); }
+        void set_instruction_pointer(int addr) { instruction_pointer = { align(addr) }; }
 
         // Debugging methods
         void debug_decode_instruction(Opcode& op) { decode_major(op); }

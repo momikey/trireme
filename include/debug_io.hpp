@@ -26,7 +26,7 @@ namespace ternary
         void print_and_clear()
         {
             print();
-            backing_input.clear();
+            backing_output.clear();
         }
 
         // Whether the debug I/O should request input

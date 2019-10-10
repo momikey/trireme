@@ -31,7 +31,7 @@ namespace ternary
         flag_register = {};
 
         instruction_pointer.set(0, Hexad::min_value, Hexad::min_value);
-        control_regs[2].set(0, -279, -1);
+        control_regs[2].set(0, -280, -1);
         registers.set(-9, { 0, -283, -364});
     }
 
@@ -117,7 +117,8 @@ namespace ternary
             // The hardware interrupt vector table is stored in
             // the CR2 register. We take the interrupt # as an
             // index into this table.
-            Word interrupt_address { add(control_regs[2], e.value()).first };
+            Word interrupt_vector { add(control_regs[2], e.value()*3).first };
+            Word interrupt_address { get_memory_word(interrupt_vector.value()) };
             
             // Save the current IP into CR3
             control_regs[3].set(instruction_pointer);

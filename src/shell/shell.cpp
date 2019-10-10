@@ -246,6 +246,41 @@ void Shell::handle_command(const std::string& input)
 
             cpu_.run();
         }
+        else if (matches[1] == "ip")
+        {
+            ////
+            // Directly alter the IP
+            ////
+
+            std::smatch ip_matches;
+            std::regex ip_matcher { balanced_integer };
+            std::string rest { matches[2] };
+            if (std::regex_match(rest, ip_matches, ip_matcher))
+            {
+                auto address { word_to_value(rest) };
+                ip_ = Cpu::align(address);
+                cpu_.set_instruction_pointer(address);
+            }
+            else
+            {
+                repl_.print("Invalid memory address\n");
+            }
+        }
+        else if (matches[1] == "at" || matches[1] == "org" || matches[1] == "origin")
+        {
+            std::smatch ip_matches;
+            std::regex ip_matcher { balanced_integer };
+            std::string rest { matches[2] };
+            if (std::regex_match(rest, ip_matches, ip_matcher))
+            {
+                auto address { word_to_value(rest) };
+                ip_ = Cpu::align(address);
+            }
+            else
+            {
+                repl_.print("Invalid memory address\n");
+            }    
+        }
     }
 
 #ifndef NDEBUG
