@@ -14,19 +14,19 @@ Trireme has 27 user-accessible registers, named by using the base-27 representat
 * r0: accumulator register, can be implied in certain operations
 * rA-rM: general-purpose registers, can be used for anything
 * rn-rz: special-purpose registers, mostly reserved for system functions, addressing modes, etc.
-	n. Index: holds an index pointer for indexed load/store operations
-	o. Overflow: used to hold the high word of multiplication or division
-	p. Pointer: holds a data pointer that is the base for load/store operations
-	q. (this register currently has no special use)
-	r. Return: holds the current system call return address
-	s. Stack: holds the address of the stack pointer
-	t. (this register currently has no special use)
-	u. Modulus: holds the remainder after a division operation
-	v. Vector: address of the system call table
-	w. (this register currently has no special use)
-	x. Extension: this register is reserved for future expansion
-	y. (this register currently has no special use)
-	z. Zero: always holds a value of %000000
+	* n. Index: holds an index pointer for indexed load/store operations
+	* o. Overflow: used to hold the high word of multiplication or division
+	* p. Pointer: holds a data pointer that is the base for load/store operations
+	* q. (this register currently has no special use)
+	* r. Return: holds the current system call return address
+	* s. Stack: holds the address of the stack pointer
+	* t. (this register currently has no special use)
+	* u. Modulus: holds the remainder after a division operation
+	* v. Vector: address of the system call table
+	* w. (this register currently has no special use)
+	* x. Extension: this register is reserved for future expansion
+	* y. (this register currently has no special use)
+	* z. Zero: always holds a value of %000000
 
 In addition, the Trireme CPU contains 9 system registers. These require special instructions to access, and they can be locked to prevent user code from overwriting their values. As with the user register set, the system set can be divided into three categories.
 
@@ -37,23 +37,23 @@ The four debug registers, DR1-4 are only used if the Trap flag (see below) is se
 Last are the control registers, CR1-4. Each of these has a different function, with CR4 currently reserved for expansion. CR1 is the flags register, a set of trits that indicate the result of certain operations or control their method of execution.
 
 * CR1 flags register trits (all those not shown are undefined, and should be considered reserver):
-	\0. Carry (C) flag: holds carry result of previous arithmetic instruction
-	\1. Sign (S) flag: holds sign of last result or last used operand
-	\2. Direction (D) flag: determines auto-increment or decrement after indirect addressing load/store
-	\5. Absolute (A) flag: determines whether the pointer register `rp` is used as a base for load/store operations
-	\6. Binary (B) flag: determines whether I/O operations are preceded by a conversion to binary (+) or ternary (-)
-	\7. Trap (T) flag: determines whether debug breakpoints are enabled
-	\8. Interrupt (I) flag: determines whether interrupts are enabled
-	\9. Protect (P) flag: determines whether load/stores to system registers are allowed; (-) allows changing IP
+	* 0. Carry (C) flag: holds carry result of previous arithmetic instruction
+	* 1. Sign (S) flag: holds sign of last result or last used operand
+	* 2. Direction (D) flag: determines auto-increment or decrement after indirect addressing load/store
+	* 5. Absolute (A) flag: determines whether the pointer register `rp` is used as a base for load/store operations
+	* 6. Binary (B) flag: determines whether I/O operations are preceded by a conversion to binary (+) or ternary (-)
+	* 7. Trap (T) flag: determines whether debug breakpoints are enabled
+	* 8. Interrupt (I) flag: determines whether interrupts are enabled
+	* 9. Protect (P) flag: determines whether load/stores to system registers are allowed; (-) allows changing IP
 
 CR2 is the interrupt vector register, containing the base address of a vector table to handle hardware-based interrupts. When an interrupt, including a CPU exception, occurs, execution is diverted to the address located in the word starting at `CR2 + (interrupt# * 3)`. The previous value of the instruction pointer is saved into CR3, the interrupt return address register, where it can be accessed by a handler subroutine.
 
 * The currently defined hardware exceptions are:
-	\0. `#D0`: divide by zero exception
-	\1. `#BK`: debug breakpoint
-	\2. `#PV`: protection violation
-	\3. `#IF`: invalid flag value
-	\4. `#OP`: undefined opcode
+	* 0. `#D0`: divide by zero exception
+	* 1. `#BK`: debug breakpoint
+	* 2. `#PV`: protection violation
+	* 3. `#IF`: invalid flag value
+	* 4. `#OP`: undefined opcode
 
 ## Memory
 
