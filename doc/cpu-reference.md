@@ -384,6 +384,8 @@ The following mnemonics are accepted synonums for logical instructions:
 
 ### Memory
 
+For all load and store operations, if the Absolute flag is set to +1, the base pointer register `rp` will be added to any computed address.
+
 #### LDR
 
 `ldr` loads into the destination register a word (3 hexads, in little-endian order) starting at the source address.
@@ -450,6 +452,11 @@ The `ldx` instruction is reserved for a future version of the Trireme architectu
 
 #### LDN
 
+The `ldn` instruction performs an indexed load. The starting memory address of the source word is the sum of the given displacement (1 hexad), the base pointer register `rp`, and the index pointer register `rn`. After the load, the value of the Direction flag is added to the `rn` register.
+
+* Format: ldn %AB, r0
+* Effect: r0 := memory_word(rp + rn + %AB); rn := rn + Direction flag
+
 #### LAD
 
 The `lad` loads an address into the r0 register.
@@ -461,13 +468,50 @@ This instruction can be used as a 12-trit immediate load, potentially saving an 
 
 #### STR
 
+`str` stores the word in the source register into memory, starting at the destination address. The store is little-endian, and no alignment checking is done.
+
+* Format: str r0, %ABCD
+* Effect: memory(%ABCF:%ABCE:%ABCD) := r0
+
 #### STL, STM, STH
+
+The `stl`, `stm`, and `sth` instructions store the low, middle, or high hexad of the source register into the destination memory address.
+
+* Format: stl r0, %ABCD
+* Effect: memory(%ABCD) := r0(low)
+
+* Format: stm r0, %ABCD
+* Effect: memory(%ABCD) := r0(middle)
+
+* Format: sth r0, %ABCD
+* Effect: memory(%ABCD) := r0(high)
 
 #### STA
 
+`sta` stores the word in the source register into memory starting at the address in the destination register. Only the lowest 12 trits of the destination register are considered; the rest are treated as 0. No alignment checking is done.
+
+* Format: sta rA, rB
+* Effect: memory_word(rB) := rA
+
 #### SAL, SAM, SAH
 
+The `sal`, `sam`, and `sah` instructions store the low, middle, or high hexad of the source register into the memory location given by the destination register.
+
+* Format: sal rA, rB
+* Effect: memory(rB) := rA(low)
+
+* Format: sam rA, rB
+* Effect: memory(rB) := rA(middle)
+
+* Format: sah rA, rB
+* Effect: memory(rB) := rA(high)
+
 #### STN
+
+The `stn` instruction performs an indexed store. The word in the source register is stored into memory starting at the address given by the sum of the displacement (1 hexad), the base pointer register `rp`, and the index pointer register `rn`. Then, the value of the Direction flag is added to the `rn` register.
+
+* Format: stn r0, %AB
+* Effect: memory_word(rp + rn + %AB) := r0; rn := rn + Direction flag
 
 #### STX
 
@@ -475,71 +519,274 @@ The `stx` instruction is reserved for a future version of the Trireme architectu
 
 #### MOV
 
+`mov` copies the word in the source register into the destination register. The source value is left unchanged.
+
+* Format: mov rA, rB
+* Effect: rB := rA
+
+Note that `mov` does not affect any flags. (An alternative that does affect flags is `add rA, rB, rz`.)
+
 #### XCH
 
-#### STZ, STP, STN
+`xch` exchanges the values in two registers in a single, atomic operation.
+
+* Format: xch rA, rB
+* Effect: rA <-> rB
+
+#### SRZ, SRP, SRN
+
+The `srz`, `srp`, and `srn` instructions set all the trits in the target register to 0, +1, or -1, respectively.
+
+* Format: srz r0
+* Effect: r0 := %000000
+
+* Format: srp r0
+* Effect: r0 := %MMMMMM
+
+* Format: srn r0
+* Effect: r0 := %zzzzzz
 
 #### PSH
 
+`psh` pushes the value in the source register onto the system stack, then decrements the stack pointer register `rs` by 3.
+
+* Format: psh r0
+* Effect: memory_word(rs) := r0; rs := rs - 3
+
 #### POP
+
+`pop` pops a word from the system stack into the destination register, then increments the stack pointer register `rs` by 3.
+
+* Format: pop r0
+* Effect: r0 := memory_word(rs); rs := rs + 3
 
 #### Synonyms
 
-The `clr` mnemonic is a synonym for `stz`.
+The `clr` mnemonic is a synonym for `srz`.
 
 ### Branch
 
+ In all branch instructions, the lowest trit of the computed address is ignored, as execution in Trireme is word-aligned; the new value of the instruction pointer will have a lowest trit of -1.
+
 #### BRA
+
+`bra` causes execution to branch unconditionally to an absolute address anywhere within the 12-trit memory space.
+
+* Format: bra %ABCD
+* Effect: IP := %ABCB
 
 #### BRR
 
+The `brr` instruction creates an unconditional branch to the address contained in the given register.
+
+* Format: bra r0
+* Effect: IP := align(r0)
+
 #### BRI
 
-#### BRS
+`bri` causes an unconditional branch to an address given by the sum of the register's contents and the immediate hexad displacement.
 
-#### BRL
+* Format: bri r0, %AB
+* Effect: IP := align(r0 + %AB)
+
+#### BRS, BRL
+
+The `brs` and `brl` instructions cause an unconditional branch relative to the instruction pointer. The given displacement is 1 hexad in the case of `brs`, 2 for `brl`, and it is added to the IP to compute the target address.
+
+* Format: brs %AB
+* Effect: IP := IP + %AB
+
+* Format: brl %ABCD
+* Effect: IP := IP + %ABCB
 
 #### BZc, BPc, BNc
 
+This class of instructions creates conditional branches, which are taken only if the chosen flag has a value of 0 (for `bzC`), +1 (for `bpC`), or -1 (for `bnC`). All branches are relative to the instruction pointer.
+
+The final letter of the mnemonic indicates the flag that is tested:
+
+|Letter| Flag     |
+|------|----------|
+| C    | Carry    |
+| S    | Sign     |
+| D    | Direction|
+| A    | Absolute |
+| B    | Binary   |
+| T    | Trap     |
+| I    | Interrupt|
+| P    | Protect  |
+
+* Format: bzc %00AB
+* Effect: IP := IP + %00AB if Carry flag = 0
+
+* Format: bpa %00AB
+* Effect: IP := IP + %00AB if Absolute flag = +1
+
+* Format: bns %00AB
+* Effect: IP := IP + %00AB if Sign flag = -1
+
 #### SZc, SPc, SNc
+
+This set of instructions creates a conditional branch that skips over the following instruction only if the chosen flag equals the given value: 0 for `szC`, +1 for `spC`, -1 for `snC`.
+
+The final letter of the mnemonic indicates the flag this is tested, as above.
+
+* Format: szc
+* Effect: IP := IP + 3 if Carry flag = 0
+
+* Format: spa
+* Effect: IP := IP + 3 if Absolute flag = +1
+
+* Format: sns
+* Effect: IP := IP + 3 if Sign flag = -1
 
 #### TBc
 
+The `tbC` family of instructions creates a 3-way indirect branch. The value added to the instruction pointer is taken from the first address register if the chosen flag is -1, the second if it is 0, and the third if it is +1.
+
+The final letter of the mnemonic indicates the flag that is tested, as above.
+
+* Format: tbc rA, rB, rC
+* Effect: One of the following
+	* IP := align(IP + rA) if Carry flag = -1
+	* IP := align(IP + rB) if Carry flag = 0
+	* IP := align(IP + rC) if Carry flag = +1
+
 #### CAL
+
+`cal` initiates a subroutine branch to the given address. The current value of the instruction pointer is pushed onto the system stack, as by the `psh` instruction. Then, the given address is loaded into IP, and execution continues from this new location.
+
+* Format: cal %00AB
+* Effect: The following, in order
+	* memory_word(rs) := IP
+	* rs := rs - 3
+	* IP := %00AB
 
 #### CAR
 
+`car` initiates a subroutine branch relative to the instruction pointer. The current value of IP is saved on the system stack, as for `cal`.
+
+* Format: car %00AB
+* Effect: The following, in order
+	* memory_word(rs) := IP
+	* rs := rs - 3
+	* IP := IP + %00AB
+
 #### CAA
+
+`caa` initiates a subroutine branch to the address stored in the given register. This is an absolute address.
+
+* Format: caa r0
+* Effect: The following, in order
+	* memory_word(rs) := IP
+	* rs := rs - 3
+	* IP := align(IP + r0)
 
 #### RET
 
+`ret` returns from a subroutine, an unconditional branch created by popping a word from the stack into the instruction pointer.
+
+* Format: ret
+* Effect: The following, in order
+	* IP := align(memory_word(rs))
+	* rs := rs + 3
+
 #### ZFc, PFc, NFc
+
+This family of instructions sets a flag to a given value: 0 for `zfC`, +1 for `pfC`, -1 for `nfC`.
+
+The final letter of the mnemonic indicates the flag to be changed, using the table above.
 
 ### Conversion
 
 #### BIN
 
+The `bin` instruction converts the value in the source register to binary. The destination register will be filled with the lowest 18 bits of the result, as trits that are never set to -1.
+
+* Format: bin rA, rB
+* Effect: rB := to_binary(rA)
+
+As an example, the value %000ABC, or decimal 786, will be converted to binary 00_0000_0011_0001_0010. This result is then encoded in nonnegative trits, with the result %00AICC.
+
 #### TRI
+
+`tri` performs a binary-to-ternary conversion on the source register, treating its trits as though they were binary bits instead. The result is placed in the destination register.
+
+* Format: tri rA, rB
+* Effect: rB := to_ternary(rA)
+
+As an example, the binary value 00_0000_0000_0101_0101 (decimal 85, hexadecimal 0x00055) is encoded as ternary %000ACJ. The `tri` instruction would convert this to ternary %0000DD, storing this value in the destination register.
 
 #### FDR
 
+`fdr` performs the forward diode operation, changing every -1 trit in the source register to 0, then storing the result in the destination register.
+
+* Format: fdr rA, rB
+* Effect: For i in 0..17 do
+	* rB(i) := rA(i) if rA(i) = +1
+	* rB(i) := 0 otherwise
+
+This is considered a conversion operation, not a logical operation, as it is intended to simulate interfacing with binary hardware.
+
 #### RDR
+
+`rdr` performs the reverse diode operation, changing every +1 trit in the source register to 0, then storing the result in the destination register.
+
+* Format: fdr rA, rB
+* Effect: For i in 0..17 do
+	* rB(i) := rA(i) if rA(i) = -1
+	* rB(i) := 0 otherwise
 
 ### I/O
 
-#### INT
+For I/O instructions, any value read from or written to the I/O space can be pre-converted into binary or ternary, exactly as with the `bin` or `tri` operations. The setting of the Binary flag determines what conversion, if any, occurs:
 
-#### INB
+| Binary flag | Effect                |
+|-------------|-----------------------|
+| +1          | Conversion to binary  |
+| 0           | No conversion         |
+| -1          | Conversion to ternary |
 
-#### OUT
+#### INT, INB
 
-#### OUB
+The `int` and `inb` instructions take input from an I/O location in ternary or binary, respectively. This word value (16 bits, in the case of binary) is then stored in the destination register.
+
+* Format: int @%ABC, r0
+* Effect: r0 := IO(%ABC)
+
+* Format: inb @%ABC, r0
+* Effect: r0 := binary_IO(%ABC)
+
+#### OUT, OUB
+
+The `out` and `oub` instructions send a value from the source register to the destination location in I/O space. `out` writes a ternary word, while `oub` writes 16 binary bits.
+
+* Format: out r0, @%ABC
+* Effect: IO(%ABC) := r0
+
+* Format: oub r0, @%ABC
+* Effect: IO(%ABC) := as_binary(r0)
 
 ### System
 
 #### SYS
 
+`sys` initiates a system call, an unconditional branch to the vector at a given location in the system call table. Trireme allows this table to be 729 entries in length, with each entry a word-length memory address. (As the address space is only 12 trits, the upper hexad is ignored at present.) The current value of the instruction pointer is stored in the system return register `rr`.
+
+The system vector register `rv` contains the base address of the system call table.
+
+* Format: sys #123
+* Effect: The following, in order
+	* rr := IP
+	* address_temp := rv + (123 * 3)
+	* IP := memory(address_temp)
+
 #### SRT
+
+`srt` returns from a system call subroutine by loading the instruction pointer with the word in the system return register `rr`.
+
+* Format: srt
+* Effect: IP := align(rr)
 
 #### BRK
 
@@ -557,7 +804,21 @@ The `nop` instruction does nothing. It can be used for padding or to indicate un
 
 #### LSR
 
+`lsr` loads the value in a system register into a general-purpose register. Valid registers begin with CR (control register) or DR (debug register). The instruction pointer can be loaded by specifying CR0.
+
+* Format: lsr CR1, r0
+* Effect: r0 := CR1
+
+If the Protect flag is set to +1, then this instruction raises a `#PV` hardware exception.
+
 #### SSR
+
+`ssr` stores the value in the source register into a given system register. CR0 (the IP) may not be overwritten with this instruction, but all others are valid.
+
+* Format: ssr r0, DR1
+* Effect: DR1 := r0
+
+If the Protect flag is set to +1, then this instruction raises a `#PV` hardware exception.
 
 #### UND
 
@@ -567,6 +828,56 @@ The `und` instruction maps to a specific opcode that is guaranteed to remain und
 * Effect: Raise the `#OP` hardware exception
 
 ### Assembler pseudo-instructions
+
+The Trireme simulator's included assembler defines 8 pseudo-instructions. None of these are executed by the processor itself; they are intended to aid the programmer.
+
+#### DH, DW
+
+These two instructions insert the given hexads (for `dh`) or words (for `dw`) directly into the assembler's output.
+
+* Format: dh 1, 2, 3
+* Effect: The hexads %0A, %0B, %0C are inserted at the assembler's current location
+
+* Format: dw -1, -2, -3
+* Effect: The words %00000n, %00000o, %00000p are inserted at the assembler's current location
+
+#### DB
+
+`db` inserts a binary byte value at the current location; this value is encoded into the lowest 8 trits of a ternary word.
+
+* Format: db 255
+* Effect: The word %000qzz is inserted at the assembler's current location
+
+#### DS
+
+`ds` inserts a string of ASCII characters, each contained in a single hexad, into the assembled output.
+
+* Format: ds "Hello, world"
+* Effect: 12 hexads, corresponding to the bytes in the given string, are inserted at the assembler's current location
+
+#### ZH, ZW
+
+These two instructions insert a given number of hexads or words, all of which are set to zero. This is intended to be used, for example, in defining memory buffers.
+
+* Format: zh 10
+* Effect: 10 hexads, all %00, are inserted at the assembler's current location
+
+* Format: zw 3
+* Effect: 3 words, all %000000, are inserted at the assembler's current location
+
+#### EQ
+
+`eq` defines a symbolic constant in the assembler. It creates no output, but allows the given value to be substituted for the identifier at any point during assembly.
+
+* Format: eq X, %ABCD
+* Effect: The identifier X is now defined to have the value %00ABCD
+
+#### AD
+
+`ad` changes the current assembly location.
+
+* Format: ad %000n
+* Effect: The next assembled instruction will be placed at address %000n
 
 # Miscellaneous notes
 
